@@ -92,7 +92,7 @@
       display: block;
     }
 
-    .auth-card input {
+    .auth-card input, .auth-card select {
       width: 100%;
       padding: 12px;
       background: var(--input-bg);
@@ -103,7 +103,7 @@
       outline: none;
     }
 
-    .auth-card input:focus {
+    .auth-card input:focus, .auth-card select:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--accent-glow);
     }
@@ -156,7 +156,21 @@
     header {
       text-align: center;
       margin-bottom: 28px;
+      position: relative;
     }
+
+    #user-session-badge {
+      position: absolute;
+      top: 0; right: 0;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    #user-session-badge strong { color: #38bdf8; }
+
     header h1 {
       font-size: 2.2rem;
       font-weight: 700;
@@ -252,7 +266,7 @@
     /* Métricas del Dashboard */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 16px;
       margin-bottom: 28px;
     }
@@ -279,6 +293,12 @@
       font-weight: 700;
       color: #38bdf8;
     }
+    .stat-card.status-critical {
+      border-color: var(--danger);
+      background: rgba(239, 68, 68, 0.08);
+    }
+    .stat-card.status-critical h3, .stat-card.status-critical .value { color: #f87171; }
+
     .stat-card::after {
       content: '';
       position: absolute;
@@ -291,6 +311,7 @@
     .stat-cajas::after { content: '📦'; }
     .stat-sueltas::after { content: '🔍'; }
     .stat-global::after { content: '📊'; }
+    .stat-criticos::after { content: '⚠️'; }
 
     /* Panel de Salida / Picking */
     .pick-panel-container {
@@ -421,6 +442,7 @@
     .map-cell:hover { transform: scale(1.05); }
     .cell-empty { background: rgba(16, 185, 129, 0.15); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
     .cell-occupied { background: rgba(239, 68, 68, 0.2); color: #f87171; border-color: rgba(239, 68, 68, 0.4); }
+    .cell-occupied.status-critical { border-color: #ef4444; background: rgba(239, 68, 68, 0.4); }
     .cell-multi { background: rgba(139, 92, 246, 0.2); color: #c084fc; border-color: rgba(139, 92, 246, 0.4); grid-column: span 3; }
 
     /* Formulario */
@@ -566,6 +588,7 @@
     }
     td { padding: 14px 16px; border-bottom: 1px solid var(--card-border); }
     tr:last-child td { border-bottom: none; }
+    tr.status-critical td { background: rgba(239, 68, 68, 0.05); }
 
     .badge {
       padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; display: inline-block;
@@ -573,6 +596,7 @@
     .badge-rack { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
     .badge-salida { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
     .badge-entrada { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-critical { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
 
     .actions { display: flex; gap: 8px; flex-wrap: wrap; }
     .btn-edit {
@@ -606,16 +630,21 @@
       
       <div class="form-group">
         <label>Usuario</label>
-        <input type="text" id="login-user" placeholder="">
+        <!-- Menú desplegable dinámico: Solo muestra operadores y Administrador principal oculto para selección de operadores -->
+        <select id="login-user">
+          <option value="" disabled selected>Seleccione Usuario...</option>
+          <option value="alexander04">Admin (alexander04)</option>
+          <option value="ChrisA">ChrisA</option>
+        </select>
       </div>
 
       <div class="form-group">
-        <label>PIN o Contraseña</label>
-        <input type="password" id="login-pin" placeholder="" onkeypress="if(event.key === 'Enter') loginAdmin()">
+        <label>Ingresar PIN</label>
+        <input type="password" id="login-pin" placeholder="" onkeypress="if(event.key === 'Enter') intentarLogin()">
       </div>
 
-      <button class="btn-login" onclick="loginAdmin()">Ingresar como Administrador</button>
-      <button class="btn-guest" onclick="loginGuest()">👀 Entrar como Invitado (Solo Lectura)</button>
+      <button class="btn-login" onclick="intentarLogin()">Ingresar al Sistema</button>
+      <button class="btn-guest" onclick="loginGuest()">👁️ Visualización</button>
       
       <div id="auth-error" class="auth-error">Usuario o PIN incorrectos.</div>
     </div>
@@ -626,6 +655,7 @@
 
   <div class="container" id="app-container">
     <header>
+      <div id="user-session-badge">Usuario: <strong id="current-user-label">Admin</strong></div>
       <h1>📦 Sistema de Control de Bodega & Mapas</h1>
       
       <!-- BOTONES SUPERIORES DE NAVEGACIÓN -->
@@ -663,6 +693,10 @@
         <h3>Gran Total Unidades</h3>
         <div class="value" id="total-global">0</div>
       </div>
+      <div class="stat-card stat-criticos" id="stat-card-criticos">
+        <h3>SKUs Críticos</h3>
+        <div class="value" id="total-criticos">0</div>
+      </div>
     </div>
 
     <!-- PANEL DE IMPORTACIÓN / EXPORTACIÓN MASIVA (Solo Admin) -->
@@ -670,7 +704,6 @@
       <div class="panel-title">📂 Gestión Masiva de Datos (Excel)</div>
       <div class="import-export-grid">
         <button class="btn-excel-action" onclick="exportarExcel()">📥 Exportar Inventario a Excel</button>
-        <button class="btn-excel-action" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);" onclick="descargarPlantilla()">📄 Descargar Plantilla Vacía</button>
         <label class="btn-excel-action" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); cursor: pointer; margin-bottom: 0;">
           📤 Importar Masivo desde Excel
           <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" style="display: none;" onchange="importarExcel(event)">
@@ -703,6 +736,7 @@
               <th>SUELTAS</th>
               <th>PRESENTACIÓN</th>
               <th>UNIDADES TOTALES</th>
+              <th>ESTADO</th>
               <th id="th-global-actions">ACCIONES</th>
             </tr>
           </thead>
@@ -774,6 +808,10 @@
             <strong id="count-occupied">0</strong>
           </div>
           <div class="legend-item">
+            <span><i class="dot" style="background:#ef4444"></i>Stock Crítico</span>
+            <strong id="count-critical">0</strong>
+          </div>
+          <div class="legend-item">
             <span><i class="dot dot-purple"></i>Jaulas Especiales</span>
             <strong id="count-cages">2</strong>
           </div>
@@ -782,7 +820,7 @@
         <div class="map-grid" id="visual-map"></div>
       </div>
 
-      <!-- Panel de Formulario Ingreso (Oculto para invitados) -->
+      <!-- Panel de Formulario Ingreso (Oculto para pickers e invitados) -->
       <div class="panel" id="form-panel-wrapper">
         <div class="panel-title" id="form-title">📦 Ingresar Nuevo Producto</div>
         <form id="inventory-form">
@@ -830,6 +868,11 @@
               <label for="units">Unidades Sueltas</label>
               <input type="number" id="units" min="0" value="" placeholder="0" onfocus="if(this.value=='0')this.value='';" onblur="if(this.value=='')this.value='0';">
             </div>
+
+            <div class="form-group">
+              <label for="minStock">Alerta Stock Mínimo (Unids)</label>
+              <input type="number" id="minStock" min="0" value="12" placeholder="12">
+            </div>
           </div>
 
           <div class="calc-banner">
@@ -846,12 +889,12 @@
     <!-- Pestañas para alternar entre Inventario Actual y Movimientos -->
     <div class="tabs-header">
       <button class="tab-btn active" id="tab-inventory-btn" onclick="switchTab('inventory')">📦 Inventario Actual por Ubicaciones</button>
-      <button class="tab-btn" id="tab-movements-btn" onclick="switchTab('movements')">📋 Historial de Movimientos (Entradas / Salidas)</button>
+      <button class="tab-btn" id="tab-movements-btn" onclick="switchTab('movements')">📋 Historial de Movimientos (Logs de Auditoría)</button>
     </div>
 
     <!-- Buscador -->
     <div class="table-tools">
-      <input type="text" id="search" placeholder="🔍 Buscar en la tabla...">
+      <input type="text" id="search" placeholder="🔍 Escanee o busque en la tabla...">
       <select id="filter-location" style="width: 220px;">
         <option value="">🌐 Todas las Ubicaciones</option>
       </select>
@@ -877,13 +920,14 @@
       </table>
     </div>
 
-    <!-- Tabla de Movimientos (Oculta por defecto) -->
+    <!-- Tabla de Movimientos -->
     <div class="table-container" id="table-movements-container" style="display: none;">
       <table>
         <thead>
           <tr>
             <th>FECHA / HORA</th>
             <th>TIPO</th>
+            <th>USUARIO</th>
             <th>UBICACIÓN</th>
             <th>CÓDIGO SAP</th>
             <th>DESCRIPCIÓN</th>
@@ -897,18 +941,25 @@
   </div>
 
   <script>
-    // Configuración de Permisos y Credenciales
-    const ADMIN_USER = "alexander04";
-    const ADMIN_PIN = "041211";
-    let esAdmin = false;
+    // Configuración de Credenciales y Roles (Admin vs Picker vs Guest)
+    const USERS_CONFIG = {
+      "alexander04": { pin: "041211", role: "admin", displayName: "Admin" },
+      "ChrisA": { pin: "042001", role: "picker", displayName: "ChrisA" }
+      // Puedes agregar más operadores aquí abajo fácilmente en el futuro
+    };
 
-    function loginAdmin() {
-      const user = document.getElementById('login-user').value.trim();
+    let userRole = "guest"; // "admin", "picker", o "guest"
+    let currentUserName = "Visualización";
+
+    function intentarLogin() {
+      const userSelect = document.getElementById('login-user').value;
       const pin = document.getElementById('login-pin').value.trim();
       const errorDiv = document.getElementById('auth-error');
 
-      if (user === ADMIN_USER && pin === ADMIN_PIN) {
-        esAdmin = true;
+      if (USERS_CONFIG[userSelect] && USERS_CONFIG[userSelect].pin === pin) {
+        userRole = USERS_CONFIG[userSelect].role;
+        currentUserName = USERS_CONFIG[userSelect].displayName; // Muestra "Admin" si es alexander04 o el nombre del operador
+        errorDiv.style.display = 'none';
         iniciarSesionExitosa();
       } else {
         errorDiv.style.display = 'block';
@@ -916,12 +967,14 @@
     }
 
     function loginGuest() {
-      esAdmin = false;
+      userRole = "guest";
+      currentUserName = "Visualización";
+      document.getElementById('auth-error').style.display = 'none';
       iniciarSesionExitosa();
     }
 
     function cerrarSesion() {
-      document.getElementById('login-user').value = '';
+      document.getElementById('login-user').selectedIndex = 0;
       document.getElementById('login-pin').value = '';
       document.getElementById('auth-error').style.display = 'none';
       document.getElementById('app-container').style.display = 'none';
@@ -931,19 +984,28 @@
     function iniciarSesionExitosa() {
       document.getElementById('auth-overlay').style.display = 'none';
       document.getElementById('app-container').style.display = 'block';
+      document.getElementById('current-user-label').textContent = currentUserName;
 
       const formWrapper = document.getElementById('form-panel-wrapper');
       const importExportSection = document.getElementById('import-export-section');
       const mainGrid = document.getElementById('main-content-grid');
+      const btnNavPick = document.getElementById('btn-nav-pick');
 
-      if (!esAdmin) {
-        if (formWrapper) formWrapper.style.display = 'none';
-        if (importExportSection) importExportSection.style.display = 'none';
-        if (mainGrid) mainGrid.style.gridTemplateColumns = '1fr';
-      } else {
+      if (userRole === "admin") {
         if (formWrapper) formWrapper.style.display = 'block';
         if (importExportSection) importExportSection.style.display = 'block';
         if (mainGrid) mainGrid.style.gridTemplateColumns = '340px 1fr';
+        if (btnNavPick) btnNavPick.style.display = 'inline-flex';
+      } else if (userRole === "picker") {
+        if (formWrapper) formWrapper.style.display = 'none';
+        if (importExportSection) importExportSection.style.display = 'none';
+        if (mainGrid) mainGrid.style.gridTemplateColumns = '1fr';
+        if (btnNavPick) btnNavPick.style.display = 'inline-flex';
+      } else {
+        if (formWrapper) formWrapper.style.display = 'none';
+        if (importExportSection) importExportSection.style.display = 'none';
+        if (mainGrid) mainGrid.style.gridTemplateColumns = '1fr';
+        if (btnNavPick) btnNavPick.style.display = 'none';
       }
       render();
     }
@@ -1031,20 +1093,21 @@
     });
 
     function saveToFirebase() {
-      if (!esAdmin) return;
+      if (userRole !== "admin") return;
       const inventoryObj = {};
       inventory.forEach(item => { inventoryObj[item.id] = item; });
       db.ref('inventario').set(inventoryObj);
     }
 
     function addMovementLog(type, location, sap, description, boxes, units) {
-      if (!esAdmin) return;
+      if (userRole === "guest") return;
       const now = new Date().toLocaleString();
       const uniqueId = 'mov_' + Date.now();
       const movData = {
         id: uniqueId,
         date: now,
-        type: type, 
+        type: type,
+        user: currentUserName, // Guarda "Admin" o el nombre del picker (ej. ChrisA) en el log de auditoría
         location: location,
         sap: sap,
         description: description,
@@ -1079,7 +1142,7 @@
     function goToHome() {
       document.getElementById('pick-panel').style.display = 'none';
       document.getElementById('global-panel').style.display = 'none';
-      document.getElementById('main-content-grid').style.display = 'grid';
+      document.getElementById('main-content-grid').style.display = userRole === "admin" ? 'grid' : 'none';
       
       document.getElementById('btn-nav-home').className = 'btn-nav active-home';
       document.getElementById('btn-nav-pick').className = 'btn-nav';
@@ -1088,8 +1151,8 @@
     }
 
     function goToPick() {
-      if (!esAdmin) {
-        alert('Modo Invitado: No tienes permisos para realizar salidas o picking.');
+      if (userRole === "guest") {
+        alert('Modo Visualización: No tienes permisos para realizar salidas o picking.');
         return;
       }
       document.getElementById('pick-panel').style.display = 'block';
@@ -1117,7 +1180,6 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // FUNCIONES DE EXPORTACIÓN E IMPORTACIÓN MASIVA DE EXCEL (Inteligente)
     function exportarExcel() {
       if (inventory.length === 0) {
         alert('No hay datos en el inventario para exportar.');
@@ -1140,18 +1202,8 @@
       XLSX.writeFile(workbook, "Inventario_Bodega_Actual.xlsx");
     }
 
-    function descargarPlantilla() {
-      const plantilla = [
-        { "Código de Ubicación": "RACK-1-A1", "Código SAP (simulado)": "SAP-SIM-0001", "Código de barras (simulado)": "EAN-SIM-0001", "Descripción del producto": "Absolut Vodka 750 ml", "Cajas": 5, "Unid/Caja": 12, "Unidades Sueltas": 0 }
-      ];
-      const worksheet = XLSX.utils.json_to_sheet(plantilla);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Plantilla");
-      XLSX.writeFile(workbook, "Plantilla_Importacion_Bodega.xlsx");
-    }
-
     function importarExcel(event) {
-      if (!esAdmin) return;
+      if (userRole !== "admin") return;
       const file = event.target.files[0];
       if (!file) return;
 
@@ -1179,20 +1231,22 @@
 
               if (!val) continue;
 
-              // Lectura inteligente y flexible adaptada a tus títulos de columnas
               if (cleanKey.includes("ubicacion") || cleanKey.includes("rack")) loc = val.toUpperCase();
               else if (cleanKey.includes("sap")) sap = val;
               else if (cleanKey.includes("barra") || cleanKey.includes("barcode")) barcode = val;
               else if (cleanKey.includes("descrip") || cleanKey.includes("producto")) desc = val;
-              else if (cleanKey.includes("caja")) boxes = parseInt(val) || 0;
-              else if (cleanKey.includes("unid") && cleanKey.includes("caja")) upb = parseInt(val) || 12;
-              else if (cleanKey.includes("suelta") || cleanKey.includes("unidad")) units = parseInt(val) || 0;
+              else if (cleanKey === "cajas" || cleanKey.includes("box")) boxes = parseInt(val) || 0;
+              else if ((cleanKey.includes("unid") && cleanKey.includes("caja")) || cleanKey.includes("presentacion")) {
+                const parsedUpb = parseInt(val);
+                if ([6, 12, 24, 36, 48].includes(parsedUpb)) upb = parsedUpb;
+              }
+              else if (cleanKey.includes("suelta") || (cleanKey.includes("unidad") && !cleanKey.includes("caja"))) {
+                units = parseInt(val) || 0;
+              }
             }
 
-            // Si la fila no trae ubicación en el Excel, asignamos por defecto la primera
             if (!loc) loc = "RACK-1-A1";
 
-            // Validamos que al menos tenga SAP y Descripción
             if (sap && desc) {
               const newId = Date.now() + index;
               const productData = {
@@ -1204,7 +1258,8 @@
                 boxes: boxes,
                 unitsPerBox: upb,
                 units: units,
-                totalUnits: (boxes * upb) + units
+                totalUnits: (boxes * upb) + units,
+                minStock: 12
               };
               inventory.push(productData);
               importadosCount++;
@@ -1214,15 +1269,15 @@
           if (importadosCount > 0) {
             saveToFirebase();
             showSuccessToast();
-            alert(`¡Importación exitosa! Se agregaron ${importadosCount} referencias correctamente.`);
+            alert(`¡Importación exitosa! Se cargaron ${importadosCount} referencias correctamente.`);
           } else {
             alert('No se pudieron leer registros. Verifica que las columnas tengan datos válidos de Código SAP y Descripción.');
           }
 
-          event.target.value = ''; // Limpiar input
+          event.target.value = '';
         } catch (error) {
           console.error(error);
-          alert('Hubo un error al procesar el archivo Excel. Revisa la consola para más detalles.');
+          alert('Hubo un error al procesar el archivo Excel.');
         }
       };
       reader.readAsArrayBuffer(file);
@@ -1234,8 +1289,8 @@
       const thActions = document.getElementById('th-global-actions');
       if (!list) return;
 
-      if (!esAdmin && thActions) thActions.style.display = 'none';
-      if (esAdmin && thActions) thActions.style.display = 'table-cell';
+      if (userRole !== "admin" && thActions) thActions.style.display = 'none';
+      if (userRole === "admin" && thActions) thActions.style.display = 'table-cell';
       list.innerHTML = '';
 
       inventory.forEach(item => {
@@ -1248,9 +1303,14 @@
           let badgeClass = 'badge-rack';
           if (item.location.includes('JAULA')) badgeClass = 'badge-salida';
 
+          const minS = item.minStock !== undefined ? item.minStock : 12;
+          const isCritical = item.totalUnits <= minS;
+          const trClass = isCritical ? 'status-critical' : '';
+
           const tr = document.createElement('tr');
+          tr.className = trClass;
           let actionsHtml = '';
-          if (esAdmin) {
+          if (userRole === "admin") {
             actionsHtml = `
               <td>
                 <div class="actions">
@@ -1270,6 +1330,7 @@
             <td>${item.units}</td>
             <td>Caja de ${item.unitsPerBox} unids.</td>
             <td><strong style="color: #38bdf8;">${item.totalUnits} unids.</strong></td>
+            <td>${isCritical ? '<span class="badge badge-critical">⚠️ CRÍTICO</span>' : '<span class="badge badge-entrada">ÓPTIMO</span>'}</td>
             ${actionsHtml}
           `;
           list.appendChild(tr);
@@ -1290,7 +1351,7 @@
     if (form) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        if (!esAdmin) return;
+        if (userRole !== "admin") return;
         const editingId = document.getElementById('editing-id').value;
         const boxes = parseInt(boxesInput.value) || 0;
         const upb = parseInt(upbInput.value) || 12;
@@ -1298,6 +1359,13 @@
         const sap = document.getElementById('sap').value;
         const description = document.getElementById('description').value;
         const location = document.getElementById('location').value.trim().toUpperCase();
+        const minStock = parseInt(document.getElementById('minStock').value) || 12;
+
+        const existingInLocation = inventory.find(item => item.location === location && item.id !== Number(editingId));
+        if (existingInLocation) {
+          const confirmar = confirm(`⚠️ Atención: La ubicación ${location} ya está ocupada por el producto "${existingInLocation.description}" (SAP: ${existingInLocation.sap}). ¿Deseas reemplazarlo/actualizarlo en esta posición?`);
+          if (!confirmar) return;
+        }
 
         const productData = {
           id: editingId ? Number(editingId) : Date.now(),
@@ -1308,7 +1376,8 @@
           boxes: boxes,
           unitsPerBox: upb,
           units: units,
-          totalUnits: (boxes * upb) + units
+          totalUnits: (boxes * upb) + units,
+          minStock: minStock
         };
 
         if (editingId) {
@@ -1353,8 +1422,8 @@
     }
 
     function openPickForRow(id) {
-      if (!esAdmin) {
-        alert('Modo Invitado: Solo puedes visualizar la información.');
+      if (userRole === "guest") {
+        alert('Modo Visualización: No tienes permisos para realizar salidas o picking.');
         return;
       }
       goToPick();
@@ -1369,7 +1438,7 @@
     }
 
     function confirmarSalidaDirecta() {
-      if (!esAdmin) return;
+      if (userRole === "guest") return;
       const selectedId = Number(document.getElementById('pick-selected-id').value);
       
       if (!selectedId) {
@@ -1420,7 +1489,13 @@
         inventory = inventory.map(i => i.id === selectedId ? item : i);
       }
 
-      saveToFirebase();
+      if (userRole === "picker") {
+        const inventoryObj = {};
+        inventory.forEach(prod => { inventoryObj[prod.id] = prod; });
+        db.ref('inventario').set(inventoryObj);
+      } else {
+        saveToFirebase();
+      }
 
       document.getElementById('pick-search-input').value = "";
       document.getElementById('pick-selected-id').value = "";
@@ -1435,7 +1510,7 @@
     }
 
     function editProduct(id) {
-      if (!esAdmin) return;
+      if (userRole !== "admin") return;
       goToHome();
       const item = inventory.find(i => i.id === id);
       if (!item) return;
@@ -1448,6 +1523,7 @@
       document.getElementById('boxes').value = item.boxes;
       document.getElementById('unitsPerBox').value = item.unitsPerBox;
       document.getElementById('units').value = item.units;
+      document.getElementById('minStock').value = item.minStock !== undefined ? item.minStock : 12;
 
       document.getElementById('form-title').textContent = '✏️ Editar Producto en Ubicación';
       document.getElementById('btn-save').textContent = 'Actualizar Cambios';
@@ -1458,8 +1534,8 @@
     }
 
     function deleteProduct(id) {
-      if (!esAdmin) {
-        alert('Modo Invitado: No tienes permisos para eliminar productos.');
+      if (userRole !== "admin") {
+        alert('Solo el Administrador puede eliminar productos.');
         return;
       }
       inventory = inventory.filter(item => item.id !== id);
@@ -1467,7 +1543,7 @@
     }
 
     function resetForm() {
-      if (!esAdmin) return;
+      if (userRole !== "admin") return;
       form.reset();
       document.getElementById('editing-id').value = '';
       document.getElementById('form-title').textContent = '📦 Ingresar Nuevo Producto';
@@ -1486,20 +1562,27 @@
       const occupiedLocations = new Set(inventory.map(item => item.location));
       let countEmpty = 0;
       let countOccupied = 0;
+      let countCritical = 0;
 
       locationsList.forEach(loc => {
         const cell = document.createElement('div');
         cell.className = 'map-cell';
 
         const isCage = loc.includes('JAULA');
+        const itemInLoc = inventory.find(i => i.location === loc);
 
         if (isCage) {
           cell.classList.add('cell-multi');
           cell.textContent = loc.replace('JAULA-', 'JAULA: ');
         } else {
-          if (occupiedLocations.has(loc)) {
+          if (itemInLoc) {
             cell.classList.add('cell-occupied');
             countOccupied++;
+            const minS = itemInLoc.minStock !== undefined ? itemInLoc.minStock : 12;
+            if (itemInLoc.totalUnits <= minS) {
+              cell.classList.add('status-critical');
+              countCritical++;
+            }
           } else {
             cell.classList.add('cell-empty');
             countEmpty++;
@@ -1520,6 +1603,7 @@
 
       document.getElementById('count-empty').textContent = countEmpty;
       document.getElementById('count-occupied').textContent = countOccupied;
+      document.getElementById('count-critical').textContent = countCritical;
       document.getElementById('loc-count').textContent = `${locationsList.length} Ubicaciones`;
     }
 
@@ -1535,8 +1619,8 @@
       const thActions = document.getElementById('th-table-actions');
       if (!list) return;
 
-      if (!esAdmin && thActions) thActions.style.display = 'none';
-      if (esAdmin && thActions) thActions.style.display = 'table-cell';
+      if (userRole !== "admin" && thActions) thActions.style.display = 'none';
+      if (userRole === "admin" && thActions) thActions.style.display = 'table-cell';
       list.innerHTML = '';
 
       inventory.forEach(item => {
@@ -1550,13 +1634,17 @@
           let badgeClass = 'badge-rack';
           if (item.location.includes('JAULA')) badgeClass = 'badge-salida';
 
+          const minS = item.minStock !== undefined ? item.minStock : 12;
+          const isCritical = item.totalUnits <= minS;
+          const trClass = isCritical ? 'status-critical' : '';
+
           const tr = document.createElement('tr');
+          tr.className = trClass;
           let actionsHtml = '';
-          if (esAdmin) {
+          if (userRole === "admin") {
             actionsHtml = `
               <td>
                 <div class="actions">
-                  <button class="btn-pick-row" onclick="openPickForRow(${item.id})">🎯 Pickear</button>
                   <button class="btn-edit" onclick="editProduct(${item.id})">Editar</button>
                   <button class="btn-delete" onclick="deleteProduct(${item.id})">Eliminar</button>
                 </div>
@@ -1570,8 +1658,8 @@
             <td>${item.barcode}</td>
             <td>${item.description}</td>
             <td>${item.boxes}</td>
-            <td>${item.unitsPerBox}</td>
             <td>${item.units}</td>
+            <td>Caja de ${item.unitsPerBox} unids.</td>
             <td><strong style="color: #38bdf8;">${item.totalUnits} unids.</strong></td>
             ${actionsHtml}
           `;
@@ -1584,10 +1672,28 @@
     }
 
     function calcularMetricasGlobales() {
-      document.getElementById('total-skus').textContent = inventory.length;
-      document.getElementById('total-cajas').textContent = inventory.reduce((acc, curr) => acc + curr.boxes, 0);
-      document.getElementById('total-sueltas').textContent = inventory.reduce((acc, curr) => acc + curr.units, 0);
-      document.getElementById('total-global').textContent = inventory.reduce((acc, curr) => acc + curr.totalUnits, 0);
+      const totalSkus = inventory.length;
+      const totalBoxes = inventory.reduce((acc, curr) => acc + curr.boxes, 0);
+      const totalUnits = inventory.reduce((acc, curr) => acc + curr.units, 0);
+      const totalGlobal = inventory.reduce((acc, curr) => acc + curr.totalUnits, 0);
+      
+      const totalCritical = inventory.filter(item => {
+        const minS = item.minStock !== undefined ? item.minStock : 12;
+        return item.totalUnits <= minS;
+      }).length;
+
+      document.getElementById('total-skus').textContent = totalSkus;
+      document.getElementById('total-cajas').textContent = totalBoxes;
+      document.getElementById('total-sueltas').textContent = totalUnits;
+      document.getElementById('total-global').textContent = totalGlobal;
+      document.getElementById('total-criticos').textContent = totalCritical;
+
+      const statCardCrit = document.getElementById('stat-card-criticos');
+      if (totalCritical > 0) {
+        statCardCrit.classList.add('status-critical');
+      } else {
+        statCardCrit.classList.remove('status-critical');
+      }
     }
 
     function renderMovements() {
@@ -1609,6 +1715,7 @@
           tr.innerHTML = `
             <td>${m.date}</td>
             <td><span class="badge ${badgeClass}">${m.type}</span></td>
+            <td><strong>${m.user || 'Admin'}</strong></td>
             <td><strong>${m.location}</strong></td>
             <td>${m.sap}</td>
             <td>${m.description}</td>
