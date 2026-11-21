@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Sistema de Gestión de Bodega & Mapas - Pro</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Firebase App y Realtime Database SDK -->
@@ -515,6 +515,102 @@
       font-weight: 700; font-size: 0.95rem; cursor: pointer; margin-top: 16px; width: 100%;
       box-shadow: 0 4px 15px var(--pick-glow);
     }
+    .btn-confirm-pick:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      filter: grayscale(0.6);
+    }
+
+    .pick-order-gate {
+      background: rgba(15, 21, 35, 0.85);
+      border: 1px solid rgba(249, 115, 22, 0.45);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .pick-order-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .pick-order-row .form-group {
+      flex: 1 1 220px;
+    }
+
+    .btn-start-order {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: white;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      min-height: 42px;
+    }
+
+    .btn-finish-order {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      min-height: 42px;
+      display: none;
+    }
+
+    .btn-release-order {
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      border: 1px solid var(--card-border);
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      min-height: 42px;
+      display: none;
+    }
+
+    .pick-order-alert {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      display: none;
+      line-height: 1.4;
+    }
+    .pick-order-alert.in-progress-other {
+      display: block;
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid #f59e0b;
+      color: #fcd34d;
+    }
+    .pick-order-alert.already-completed {
+      display: block;
+      background: rgba(239, 68, 68, 0.16);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+    }
+    .pick-order-alert.active-mine {
+      display: block;
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid #10b981;
+      color: #6ee7b7;
+    }
+
+    .pick-fields-locked {
+      opacity: 0.45;
+      pointer-events: none;
+      user-select: none;
+    }
 
     /* Panel de Importación / Exportación Masiva */
     .import-export-panel {
@@ -629,6 +725,594 @@
       background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);
       padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem;
     }
+
+    .btn-nav.active-users {
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      color: white;
+      border-color: #06b6d4;
+      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.35);
+    }
+
+    .users-panel-container {
+      display: none;
+      background: rgba(6, 182, 212, 0.08);
+      backdrop-filter: blur(10px);
+      border: 2px solid #06b6d4;
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 28px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .perms-box {
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 14px;
+    }
+
+    .perms-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .preset-btns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-preset {
+      background: rgba(59, 130, 246, 0.16);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-preset:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .perms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+
+    .perm-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 9px 11px;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    .perm-check input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #06b6d4;
+      cursor: pointer;
+    }
+
+    .perm-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .perm-pill {
+      background: rgba(6, 182, 212, 0.16);
+      color: #67e8f9;
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+
+  
+    /* =========================================================================
+       INTERFAZ RESPONSIVE ESPECIAL PARA CELULAR, PDT, PDA Y TABLET (<= 900px)
+       En PC (> 900px) se mantiene intacto tal cual el diseño original.
+       ========================================================================= */
+    @media (max-width: 900px) {
+      html, body {
+        max-width: 100vw;
+        overflow-x: hidden;
+        padding: 10px 10px 84px 10px;
+        -webkit-text-size-adjust: 100%;
+      }
+
+      /* Login adaptado a pantalla táctil / PDT */
+      #auth-overlay {
+        padding: 14px;
+        align-items: center;
+      }
+      .auth-card {
+        padding: 22px 18px;
+        max-width: 100%;
+        border-radius: 14px;
+      }
+      .auth-card h2 { font-size: 1.3rem; }
+      .auth-card input, .auth-card select {
+        font-size: 16px !important; /* Evita auto-zoom en iOS/Android/PDT */
+        padding: 13px 12px;
+      }
+      .btn-login, .btn-guest {
+        padding: 14px;
+        font-size: 1rem;
+      }
+
+      /* Header compacto y limpio en móvil */
+      header {
+        margin-bottom: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      #user-session-badge {
+        position: static;
+        align-self: flex-end;
+        font-size: 0.78rem;
+        padding: 5px 10px;
+      }
+      header h1 {
+        font-size: 1.25rem;
+        line-height: 1.25;
+        margin-bottom: 2px;
+      }
+
+      /* Barra de navegación fija inferior estilo App móvil / PDT (sin hacer zoom) */
+      .nav-buttons-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 9990;
+        margin-top: 0;
+        padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+        background: rgba(11, 15, 25, 0.97);
+        backdrop-filter: blur(12px);
+        border-top: 1px solid var(--card-border);
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-around;
+        gap: 4px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
+      }
+
+      .nav-buttons-bar .btn-nav {
+        flex: 1 1 0;
+        min-width: 0;
+        padding: 8px 4px;
+        font-size: 0.72rem;
+        border-radius: 8px;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        gap: 3px;
+        line-height: 1.1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .nav-buttons-bar .btn-nav:hover {
+        transform: none;
+      }
+
+      /* Toast centrado arriba en móvil */
+      #success-toast {
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        text-align: center;
+        font-size: 0.9rem;
+        padding: 12px 14px;
+      }
+
+      /* KPIs en cuadrícula compacta de 2 columnas (5ta tarjeta a ancho completo) */
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .stats-grid .stat-card:last-child {
+        grid-column: span 2;
+      }
+      .stat-card {
+        padding: 12px;
+        border-radius: 10px;
+      }
+      .stat-card h3 {
+        font-size: 0.7rem;
+        margin-bottom: 4px;
+      }
+      .stat-card .value {
+        font-size: 1.35rem;
+      }
+      .stat-card::after {
+        font-size: 1.3rem;
+        right: 8px;
+        bottom: 6px;
+      }
+
+      /* Paneles a 1 columna con inputs de 16px para que el navegador móvil NUNCA haga zoom */
+      .main-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+
+      .panel, .pick-panel-container, .global-panel-container, .users-panel-container, .import-export-panel {
+        padding: 14px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+      }
+
+      .panel-title, .pick-title, .global-title {
+        font-size: 1rem;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      input, select, textarea {
+        font-size: 16px !important; /* Crucial: evita auto-zoom en celulares y PDTs */
+        padding: 12px;
+        min-height: 44px;
+        width: 100%;
+      }
+
+      .btn-submit, .btn-confirm-pick, .btn-cancel, .btn-excel-action {
+        min-height: 46px;
+        font-size: 0.95rem;
+        padding: 12px 14px;
+        width: 100%;
+        justify-content: center;
+      }
+
+      /* Mapa visual táctil cómodo para dedos en celular/PDT */
+      .map-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        max-height: 290px;
+      }
+      .map-cell {
+        padding: 10px 4px;
+        font-size: 0.72rem;
+      }
+      .cell-multi {
+        grid-column: span 4;
+        padding: 11px 8px;
+        font-size: 0.78rem;
+      }
+
+      /* Permisos de usuario en 1 columna cómoda */
+      .perms-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .perm-check {
+        padding: 11px;
+        font-size: 0.9rem;
+      }
+      .preset-btns {
+        width: 100%;
+      }
+      .btn-preset {
+        flex: 1 1 calc(50% - 6px);
+        padding: 8px 6px;
+        text-align: center;
+      }
+
+      /* Pestañas y buscadores apilados */
+      .tabs-header {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .tab-btn {
+        width: 100%;
+        text-align: center;
+        padding: 12px;
+      }
+
+      .table-tools {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .table-tools select {
+        width: 100% !important;
+      }
+
+      /* Conversión de Tablas a TARJETAS MÓVILES (Cero scroll horizontal y cero zoom) */
+      .table-container {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        overflow-x: visible;
+      }
+      .table-container table,
+      .table-container thead,
+      .table-container tbody,
+      .table-container tr,
+      .table-container td {
+        display: block;
+        width: 100%;
+      }
+      .table-container thead {
+        display: none;
+      }
+      .table-container tr {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+      }
+      .table-container tr.status-critical {
+        border-color: var(--danger);
+        background: rgba(239, 68, 68, 0.12);
+      }
+      .table-container td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        text-align: right;
+        font-size: 0.88rem;
+        word-break: break-word;
+      }
+      .table-container td:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      .table-container td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        text-align: left;
+        flex-shrink: 0;
+      }
+      .table-container td .actions {
+        justify-content: flex-end;
+        width: 100%;
+      }
+      .table-container td .btn-edit,
+      .table-container td .btn-delete,
+      .table-container td .btn-pick-row {
+        padding: 8px 12px;
+        font-size: 0.82rem;
+      }
+    }
+
+  
+    /* Mejoras visuales estilo WMS / SAP */
+    .header-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .panel, .stat-card, .pick-panel-container, .global-panel-container, .users-panel-container, .import-export-panel {
+      border-color: rgba(56, 189, 248, 0.14);
+      box-shadow: 0 12px 32px rgba(2, 6, 23, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .stat-card {
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(96, 165, 250, 0.45);
+      box-shadow: 0 14px 34px rgba(2, 6, 23, 0.55);
+    }
+
+    .loc-inspector-card {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      min-height: 46px;
+    }
+    .loc-inspector-card strong {
+      color: var(--text-main);
+      font-size: 0.85rem;
+    }
+    .loc-inspector-pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .pill-free {
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .pill-busy {
+      background: rgba(239, 68, 68, 0.18);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+    .pill-cage {
+      background: rgba(139, 92, 246, 0.18);
+      color: #d8b4fe;
+      border: 1px solid rgba(139, 92, 246, 0.4);
+    }
+
+    .map-cell.is-selected {
+      outline: 2px solid #38bdf8;
+      outline-offset: 1px;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+      transform: scale(1.04);
+      z-index: 2;
+    }
+
+    table tbody tr:hover td {
+      background: rgba(59, 130, 246, 0.06);
+    }
+
+  
+    /* Mejoras visuales y operativas del Módulo de Picking */
+    .pick-session-bar {
+      display: none;
+      background: linear-gradient(135deg, rgba(249, 115, 22, 0.16), rgba(16, 185, 129, 0.12));
+      border: 1px solid rgba(249, 115, 22, 0.45);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      display: none;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .pick-session-bar.active {
+      display: flex;
+    }
+    .pick-session-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      font-size: 0.86rem;
+    }
+    .pick-metric-chip {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 5px 10px;
+      border-radius: 8px;
+      color: #e2e8f0;
+    }
+    .pick-metric-chip strong {
+      color: #fb923c;
+    }
+
+    .pick-multi-loc-hint {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      color: #93c5fd;
+      display: none;
+    }
+    .pick-multi-loc-hint button {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.45);
+      color: #bfdbfe;
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-left: 4px;
+      margin-top: 4px;
+    }
+    .pick-multi-loc-hint button:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .pick-preview-box {
+      margin-top: 14px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.86rem;
+    }
+    .pick-preview-rem {
+      font-weight: 700;
+      color: #38bdf8;
+    }
+    .pick-preview-rem.is-zero {
+      color: #fca5a5;
+    }
+    .pick-preview-rem.is-crit {
+      color: #fcd34d;
+    }
+
+    .pick-order-items-card {
+      margin-top: 18px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      border-radius: 10px;
+      padding: 14px;
+      display: none;
+    }
+    .pick-order-items-card.has-items {
+      display: block;
+    }
+    .pick-order-items-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fdba74;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pick-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 190px;
+      overflow-y: auto;
+    }
+    .pick-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: rgba(30, 41, 59, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.82rem;
+    }
+    .pick-item-qty {
+      font-weight: 700;
+      color: #fb923c;
+      white-space: nowrap;
+    }
+
   </style>
 </head>
 <body>
@@ -643,8 +1327,6 @@
         <label>Usuario</label>
         <select id="login-user">
           <option value="" disabled selected>Seleccione Usuario...</option>
-          <option value="alexander04">Admin (alexander04)</option>
-          <option value="ChrisA">ChrisA</option>
         </select>
       </div>
 
@@ -661,11 +1343,29 @@
   </div>
 
   <!-- Mensaje Toast Flotante de Éxito -->
+    <!-- MODAL VERIFICACIÓN CONTRASEÑA ADMIN PARA VER PINES -->
+  <div id="pin-verify-modal" style="display:none; position:fixed; inset:0; background:rgba(7,11,20,0.85); backdrop-filter:blur(6px); z-index:99999; justify-content:center; align-items:center; padding:16px;">
+    <div class="auth-card" style="max-width:380px;">
+      <h3 style="margin-bottom:8px; color:#67e8f9;">🔐 Verificar Contraseña de Admin</h3>
+      <p style="margin-bottom:14px; font-size:0.85rem; color:var(--text-muted);">Ingresa tu PIN / contraseña de administrador para mostrar o ocultar los PINs de usuario.</p>
+      <div class="form-group">
+        <label for="admin-verify-pin-input">Contraseña / PIN de Admin</label>
+        <input type="password" id="admin-verify-pin-input" placeholder="Ingresa tu PIN..." onkeypress="if(event.key==='Enter'){ event.preventDefault(); confirmarVerificacionAdminPin(); }">
+      </div>
+      <div id="admin-verify-pin-error" class="auth-error" style="margin-bottom:10px;">Contraseña incorrecta.</div>
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn-login" style="margin-top:0;" onclick="confirmarVerificacionAdminPin()">Verificar</button>
+        <button type="button" class="btn-guest" style="margin-top:0;" onclick="cerrarModalAdminPin()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <div id="success-toast">🚀 ¡Operación realizada con éxito! Stock actualizado.</div>
 
   <div class="container" id="app-container">
     <header>
       <div id="user-session-badge">Usuario: <strong id="current-user-label">Admin</strong></div>
+      <div class="header-subtitle">WMS & Control de Inventario Operativo</div>
       <h1>📦 Sistema de Control de Bodega & Mapas</h1>
       
       <!-- BOTONES SUPERIORES DE NAVEGACIÓN -->
@@ -678,6 +1378,12 @@
         </button>
         <button class="btn-nav" id="btn-nav-global" onclick="goToGlobalInventory()">
           📊 Inventario Global
+        </button>
+        <button class="btn-nav" id="btn-nav-movements" onclick="goToMovementsTab()">
+          📋 Movimientos
+        </button>
+        <button class="btn-nav" id="btn-nav-users" onclick="goToUsers()" style="display: none;">
+          👥 Usuarios
         </button>
         <button class="btn-nav btn-logout" onclick="cerrarSesion()">
           🚪 Cerrar Sesión
@@ -709,6 +1415,82 @@
       </div>
     </div>
 
+    <!-- PANEL DE GESTIÓN DE USUARIOS Y PERMISOS CONFIGURABLES -->
+    <div class="users-panel-container" id="users-panel">
+      <div class="pick-header">
+        <div class="pick-title" style="color: #67e8f9;">
+          <span>👥 Gestión de Usuarios y Permisos</span>
+        </div>
+        <button class="btn-close-pick" onclick="goToHome()">✕</button>
+      </div>
+
+      <form id="new-user-form" onsubmit="registrarNuevoUsuario(event)" style="margin-bottom: 20px;">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="new-username">Nombre de Usuario</label>
+            <input type="text" id="new-username" required placeholder="Ingresar usuario..." autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="new-userpin">PIN de Acceso</label>
+            <input type="text" id="new-userpin" required placeholder="Ingresar PIN..." autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="new-userrole-tag">Perfil / Rol Base</label>
+            <select id="new-userrole-tag" onchange="aplicarPresetEnFormulario(this.value)">
+              <option value="admin">Admin (Control Total)</option>
+              <option value="solo_ingresar">Solo Ingresar</option>
+              <option value="picker" selected>Pickear (Solo Salidas)</option>
+              <option value="guest">Visualizar (Solo Lectura)</option>
+              <option value="custom">Personalizado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="perms-box">
+          <div class="perms-title-row">
+            <strong style="font-size: 0.88rem; color: #e2e8f0;">Habilitar qué permisos otorgar:</strong>
+            <div class="preset-btns">
+              <button type="button" class="btn-preset" onclick="aplicarPresetEnFormulario('admin')">⚡ Todo (Admin)</button>
+              <button type="button" class="btn-preset" onclick="aplicarPresetEnFormulario('solo_ingresar')">📦 Solo Ingresar</button>
+              <button type="button" class="btn-preset" onclick="aplicarPresetEnFormulario('picker')">🎯 Solo Pickear</button>
+              <button type="button" class="btn-preset" onclick="aplicarPresetEnFormulario('solo_movimientos')">📋 Solo Movimientos</button>
+              <button type="button" class="btn-preset" onclick="aplicarPresetEnFormulario('guest')">👁️ Solo Visualizar</button>
+            </div>
+          </div>
+
+          <div class="perms-grid">
+            <label class="perm-check"><input type="checkbox" id="perm-ingresar"> <span>Ingresar / Editar Stock</span></label>
+            <label class="perm-check"><input type="checkbox" id="perm-pickear" checked> <span>Pickear / Registrar Salida</span></label>
+            <label class="perm-check"><input type="checkbox" id="perm-global"> <span>Ver Inventario Global</span></label>
+            <label class="perm-check"><input type="checkbox" id="perm-movimientos"> <span>Ver Pestaña Movimientos</span></label>
+            <label class="perm-check"><input type="checkbox" id="perm-excel"> <span>Exportar / Importar Excel</span></label>
+            <label class="perm-check"><input type="checkbox" id="perm-eliminar"> <span>Eliminar Registros</span></label>
+            <label class="perm-check"><input type="checkbox" id="perm-usuarios"> <span>Administrar Usuarios</span></label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" style="margin-top: 14px;">➕ Registrar y Guardar Usuario</button>
+      </form>
+
+      <div class="table-container" style="margin-bottom: 0;">
+        <table>
+          <thead>
+            <tr>
+              <th>USUARIO</th>
+              <th>PIN</th>
+              <th>ROL / PERFIL</th>
+              <th>PERMISOS ACTIVOS</th>
+              <th>MODIFICAR PERMISOS</th>
+              <th>ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody id="users-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- PANEL DE IMPORTACIÓN / EXPORTACIÓN MASIVA -->
     <div class="import-export-panel" id="import-export-section" style="display: none;">
       <div class="panel-title">📂 Gestión Masiva de Datos (Excel)</div>
@@ -719,6 +1501,20 @@
           <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" style="display: none;" onchange="importarExcel(event)">
         </label>
       </div>
+    </div>
+
+    <!-- PANEL DEDICADO DE MOVIMIENTOS -->
+    <div class="global-panel-container" id="movements-panel" style="border-color: #38bdf8; background: rgba(14, 165, 233, 0.08); display: none;">
+      <div class="global-header">
+        <div class="global-title" style="color: #7dd3fc;">
+          <span>📋 Movimientos Realizados</span>
+        </div>
+        <button class="btn-close-pick" id="btn-close-movements-panel" onclick="goToHome()">✕</button>
+      </div>
+      <div class="table-tools" style="margin-bottom: 16px;">
+        <input type="text" id="movements-panel-search" placeholder="🔍 Filtrar por # de orden, SAP, descripción, ubicación o usuario..." oninput="renderMovements()">
+      </div>
+      <div class="table-container" id="movements-panel-table-wrap"></div>
     </div>
 
     <!-- PANEL DE INVENTARIO GLOBAL -->
@@ -764,13 +1560,39 @@
         <button class="btn-close-pick" onclick="goToHome()">✕</button>
       </div>
 
-      <div id="pick-form">
+      <!-- RESUMEN EN VIVO DE ORDEN ACTIVA -->
+      <div class="pick-session-bar" id="pick-session-bar">
+        <div class="pick-session-metrics">
+          <div class="pick-metric-chip">Orden: <strong id="pick-live-order">-</strong></div>
+          <div class="pick-metric-chip">Picker: <strong id="pick-live-user">-</strong></div>
+          <div class="pick-metric-chip">Líneas descontadas: <strong id="pick-live-lines">0</strong></div>
+        </div>
+        <span class="badge badge-entrada" id="pick-live-status">ORDEN ACTIVA</span>
+      </div>
+
+      <!-- PASO 1: IDENTIFICAR Y BLOQUEAR NÚMERO DE ORDEN DE PICKING -->
+      <div class="pick-order-gate">
+        <div class="pick-order-row">
+          <div class="form-group">
+            <label for="pick-order-number">📋 N° de Orden / Picking (Obligatorio antes de pickear)</label>
+            <input type="text" id="pick-order-number" placeholder="Ingresar # de orden" autocomplete="off" oninput="verificarEstadoOrdenPicking()" onkeypress="if(event.key === 'Enter'){ event.preventDefault(); iniciarOrdenPicking(); }">
+          </div>
+          <button type="button" class="btn-start-order" id="btn-start-pick-order" onclick="iniciarOrdenPicking()">▶️ Iniciar Picking</button>
+          <button type="button" class="btn-finish-order" id="btn-finish-pick-order" onclick="finalizarOrdenPicking()">✅ Finalizar Orden</button>
+          <button type="button" class="btn-release-order" id="btn-release-pick-order" onclick="liberarOrdenPicking()">🔓 Liberar / Cambiar</button>
+        </div>
+        <div id="pick-order-status-banner" class="pick-order-alert"></div>
+      </div>
+
+      <!-- PASO 2: PRODUCTOS DE LA ORDEN (Desbloqueado solo cuando la orden está tomada por el usuario actual) -->
+      <div id="pick-form" class="pick-fields-locked">
         <input type="hidden" id="pick-selected-id" value="">
         <div class="form-grid">
           <div class="form-group">
-            <label for="pick-search-input">🔍 Buscar y Seleccionar Producto</label>
-            <input type="text" id="pick-search-input" list="pick-products-list" placeholder="Escribe nombre, SAP o ubicación..." autocomplete="off" oninput="onPickSearchInput()">
+            <label for="pick-search-input">🔍 Buscar / Escanear (Nombre, SAP, Código o Ubicación)</label>
+            <input type="text" id="pick-search-input" list="pick-products-list" placeholder="Escribe nombre, SAP, código de barras o ubicación..." autocomplete="off" oninput="onPickSearchInput()">
             <datalist id="pick-products-list"></datalist>
+            <div class="pick-multi-loc-hint" id="pick-multi-loc-hint"></div>
           </div>
 
           <div class="form-group">
@@ -794,7 +1616,20 @@
           </div>
         </div>
 
-        <button type="button" class="btn-confirm-pick" id="btn-confirm-pick-action" onclick="confirmarSalidaDirecta()">🔥 CONFIRMAR SALIDA Y ACTUALIZAR BODEGA</button>
+        <div class="pick-preview-box" id="pick-preview-box">
+          <span>Stock restante estimado tras salida:</span>
+          <span class="pick-preview-rem" id="pick-rem-text">Selecciona un producto y cantidad</span>
+        </div>
+
+        <button type="button" class="btn-confirm-pick" id="btn-confirm-pick-action" onclick="confirmarSalidaDirecta()">🔥 CONFIRMAR SALIDA EN ORDEN Y ACTUALIZAR BODEGA</button>
+
+        <div class="pick-order-items-card" id="pick-order-items-card">
+          <div class="pick-order-items-title">
+            <span>📦 Productos descontados en esta orden</span>
+            <span id="pick-order-items-count" style="font-size: 0.78rem; color: #94a3b8;">0 ítems</span>
+          </div>
+          <div class="pick-items-list" id="pick-order-items-list"></div>
+        </div>
       </div>
     </div>
 
@@ -840,6 +1675,13 @@
           </select>
         </div>
 
+        <div class="loc-inspector-card" id="loc-inspector">
+          <div>
+            <strong id="inspector-title">Selecciona o pasa el cursor por una ubicación</strong>
+            <div id="inspector-sub" style="font-size: 0.74rem; margin-top: 2px;">Verás su estado, SKU y stock al instante</div>
+          </div>
+          <span class="loc-inspector-pill pill-free" id="inspector-badge">MAPA</span>
+        </div>
         <div class="map-grid" id="visual-map"></div>
       </div>
 
@@ -956,6 +1798,7 @@
           <tr>
             <th>FECHA / HORA</th>
             <th>TIPO</th>
+            <th>N° PICKING</th>
             <th>USUARIO</th>
             <th>UBICACIÓN</th>
             <th>CÓDIGO SAP</th>
@@ -970,16 +1813,387 @@
   </div>
 
   <script>
-    // Configuración de Credenciales y Roles (Admin vs Picker vs Guest)
-    const USERS_CONFIG = {
-      "alexander04": { pin: "041211", role: "admin", displayName: "Admin" },
-      "ChrisA": { pin: "042001", role: "picker", displayName: "ChrisA" }
+    function formatNum(num) {
+      const n = Number(num) || 0;
+      return n.toLocaleString("en-US");
+    }
+
+    // Configuración de Credenciales, Roles y Permisos Configurables
+    const PERMISOS_PRESETS = {
+      admin: {
+        roleLabel: "Admin",
+        role: "admin",
+        ingresar: true,
+        pickear: true,
+        global: true,
+        movimientos: true,
+        excel: true,
+        eliminar: true,
+        usuarios: true
+      },
+      solo_ingresar: {
+        roleLabel: "Solo Ingresar",
+        role: "ingresar",
+        ingresar: true,
+        pickear: false,
+        global: false,
+        movimientos: false,
+        excel: false,
+        eliminar: false,
+        usuarios: false
+      },
+      picker: {
+        roleLabel: "Pickear",
+        role: "picker",
+        ingresar: false,
+        pickear: true,
+        global: false,
+        movimientos: false,
+        excel: false,
+        eliminar: false,
+        usuarios: false
+      },
+      solo_movimientos: {
+        roleLabel: "Solo Movimientos",
+        role: "movimientos",
+        ingresar: false,
+        pickear: false,
+        global: false,
+        movimientos: true,
+        excel: false,
+        eliminar: false,
+        usuarios: false
+      },
+      guest: {
+        roleLabel: "Visualizar",
+        role: "guest",
+        ingresar: false,
+        pickear: false,
+        global: true,
+        movimientos: false,
+        excel: false,
+        eliminar: false,
+        usuarios: false
+      }
+    };
+
+    const STORAGE_USERS_KEY = "wms_usuarios_sistema_v1";
+
+    const DEFAULT_USERS_CONFIG = {
+      "alexander04": { pin: "041211", displayName: "Admin", ...PERMISOS_PRESETS.admin },
+      "ChrisA": { pin: "042001", displayName: "ChrisA", ...PERMISOS_PRESETS.picker }
     };
 
     const MAX_CAGE_REFS = 100;
 
-    let userRole = "guest"; 
+    let userRole = "guest";
     let currentUserName = "Visualización";
+    let currentUserKey = "";
+    let currentUserPerms = { ...PERMISOS_PRESETS.guest };
+
+    function cargarUsuariosSistema() {
+      const base = JSON.parse(JSON.stringify(DEFAULT_USERS_CONFIG));
+      try {
+        const raw = localStorage.getItem(STORAGE_USERS_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === "object") {
+            Object.keys(parsed).forEach(k => {
+              const u = parsed[k] || {};
+              base[k] = {
+                pin: String(u.pin ?? "").trim(),
+                displayName: u.displayName || k,
+                roleLabel: u.roleLabel || (u.usuarios ? "Admin" : (u.pickear ? "Pickear" : "Visualizar")),
+                role: u.role || (u.usuarios ? "admin" : (u.pickear ? "picker" : "guest")),
+                ingresar: !!u.ingresar,
+                pickear: !!u.pickear,
+                global: u.global !== undefined ? !!u.global : true,
+                movimientos: u.movimientos !== undefined ? !!u.movimientos : (u.role === "admin" || !!u.usuarios),
+                excel: !!u.excel,
+                eliminar: !!u.eliminar,
+                usuarios: !!u.usuarios
+              };
+            });
+          }
+        }
+      } catch (e) {}
+
+      // Asegurar siempre los PINs base de alexander04 y ChrisA si no fueron cambiados
+      if (!base["alexander04"] || !base["alexander04"].pin) {
+        base["alexander04"] = { pin: "041211", displayName: "Admin", ...PERMISOS_PRESETS.admin };
+      }
+      if (!base["ChrisA"] || !base["ChrisA"].pin) {
+        base["ChrisA"] = { pin: "042001", displayName: "ChrisA", ...PERMISOS_PRESETS.picker };
+      }
+      return base;
+    }
+
+    let USERS_CONFIG = cargarUsuariosSistema();
+
+    function guardarUsuariosSistema() {
+      try {
+        localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(USERS_CONFIG));
+      } catch (e) {}
+      if (typeof db !== "undefined" && db) {
+        db.ref("usuarios_sistema").set(USERS_CONFIG);
+      }
+      poblarSelectorLogin();
+      renderUsersTable();
+    }
+
+    function poblarSelectorLogin() {
+      const sel = document.getElementById("login-user");
+      if (!sel) return;
+      const prev = sel.value;
+      sel.innerHTML = `<option value="" disabled selected>Seleccione Usuario...</option>` +
+        Object.keys(USERS_CONFIG).map(u => {
+          const info = USERS_CONFIG[u];
+          const label = info.displayName && info.displayName !== u
+            ? `${info.displayName} (${u})`
+            : `${u}`;
+          return `<option value="${u}">${label}</option>`;
+        }).join("");
+      if (prev && USERS_CONFIG[prev]) {
+        sel.value = prev;
+      }
+    }
+
+    function calcularEtiquetaRol(perms) {
+      if (perms.ingresar && perms.pickear && perms.global && perms.excel && perms.eliminar && perms.usuarios) {
+        return { roleLabel: "Admin", role: "admin" };
+      }
+      if (perms.ingresar && !perms.pickear && !perms.excel && !perms.eliminar && !perms.usuarios) {
+        return { roleLabel: "Solo Ingresar", role: "ingresar" };
+      }
+      if (perms.pickear && !perms.ingresar && !perms.excel && !perms.eliminar && !perms.usuarios) {
+        return { roleLabel: "Pickear", role: "picker" };
+      }
+      if (perms.movimientos && !perms.ingresar && !perms.pickear && !perms.global && !perms.excel && !perms.eliminar && !perms.usuarios) {
+        return { roleLabel: "Solo Movimientos", role: "movimientos" };
+      }
+      if (!perms.ingresar && !perms.pickear && !perms.movimientos && !perms.excel && !perms.eliminar && !perms.usuarios) {
+        return { roleLabel: "Visualizar", role: "guest" };
+      }
+      return { roleLabel: "Personalizado", role: perms.usuarios ? "admin" : (perms.pickear ? "picker" : "guest") };
+    }
+
+    function aplicarPresetEnFormulario(presetKey) {
+      const preset = PERMISOS_PRESETS[presetKey];
+      if (!preset) return;
+      document.getElementById("perm-ingresar").checked = !!preset.ingresar;
+      document.getElementById("perm-pickear").checked = !!preset.pickear;
+      document.getElementById("perm-global").checked = !!preset.global;
+      if (document.getElementById("perm-movimientos")) document.getElementById("perm-movimientos").checked = !!preset.movimientos;
+      document.getElementById("perm-excel").checked = !!preset.excel;
+      document.getElementById("perm-eliminar").checked = !!preset.eliminar;
+      document.getElementById("perm-usuarios").checked = !!preset.usuarios;
+    }
+
+    function leerPermisosFormulario() {
+      const rawPerms = {
+        ingresar: document.getElementById("perm-ingresar").checked,
+        pickear: document.getElementById("perm-pickear").checked,
+        global: document.getElementById("perm-global").checked,
+        movimientos: document.getElementById("perm-movimientos") ? document.getElementById("perm-movimientos").checked : false,
+        excel: document.getElementById("perm-excel").checked,
+        eliminar: document.getElementById("perm-eliminar").checked,
+        usuarios: document.getElementById("perm-usuarios").checked
+      };
+      const tag = calcularEtiquetaRol(rawPerms);
+      return { ...rawPerms, ...tag };
+    }
+
+    function registrarNuevoUsuario(e) {
+      e.preventDefault();
+      if (!currentUserPerms.usuarios) {
+        alert("No tienes permiso para administrar usuarios.");
+        return;
+      }
+      const username = document.getElementById("new-username").value.trim();
+      const pin = String(document.getElementById("new-userpin").value || "").trim();
+      if (!username || !pin) return;
+
+      if (USERS_CONFIG[username]) {
+        const ok = confirm(`El usuario "${username}" ya existe. ¿Deseas actualizar su PIN y permisos?`);
+        if (!ok) return;
+      }
+
+      const perms = leerPermisosFormulario();
+      USERS_CONFIG[username] = {
+        pin,
+        displayName: username,
+        ...perms
+      };
+
+      guardarUsuariosSistema();
+      document.getElementById("new-user-form").reset();
+      document.getElementById("new-userrole-tag").value = "picker";
+      aplicarPresetEnFormulario("picker");
+      showSuccessToast();
+    }
+
+    function alternarPermisoUsuario(username, campo) {
+      if (!currentUserPerms.usuarios || !USERS_CONFIG[username]) return;
+      USERS_CONFIG[username][campo] = !USERS_CONFIG[username][campo];
+      const tag = calcularEtiquetaRol(USERS_CONFIG[username]);
+      USERS_CONFIG[username].roleLabel = tag.roleLabel;
+      USERS_CONFIG[username].role = tag.role;
+
+      if (currentUserKey === username) {
+        currentUserPerms = { ...USERS_CONFIG[username] };
+        userRole = currentUserPerms.role;
+        aplicarVisibilidadPorPermisos();
+      }
+      guardarUsuariosSistema();
+    }
+
+    function aplicarRolRapidoAUsuario(username, presetKey) {
+      if (!currentUserPerms.usuarios || !USERS_CONFIG[username]) return;
+      const preset = PERMISOS_PRESETS[presetKey];
+      if (!preset) return;
+      const pinActual = USERS_CONFIG[username].pin;
+      const displayActual = USERS_CONFIG[username].displayName || username;
+      USERS_CONFIG[username] = {
+        pin: pinActual,
+        displayName: displayActual,
+        ...preset
+      };
+      if (currentUserKey === username) {
+        currentUserPerms = { ...USERS_CONFIG[username] };
+        userRole = currentUserPerms.role;
+        aplicarVisibilidadPorPermisos();
+      }
+      guardarUsuariosSistema();
+    }
+
+    function eliminarUsuario(username) {
+      if (!currentUserPerms.usuarios) return;
+      if (username === "alexander04") {
+        alert("No puedes eliminar el usuario principal alexander04.");
+        return;
+      }
+      if (!confirm(`¿Eliminar al usuario "${username}"?`)) return;
+      delete USERS_CONFIG[username];
+      guardarUsuariosSistema();
+    }
+
+    let pinesVisiblesPorAdmin = false;
+    let accionPendientePin = null;
+
+    function solicitarVerificacionAdminPin(accionCallback) {
+      if (!currentUserPerms.usuarios && userRole !== "admin") {
+        alert("Solo el administrador puede ver los PINs.");
+        return;
+      }
+      accionPendientePin = typeof accionCallback === "function" ? accionCallback : null;
+      const modal = document.getElementById("pin-verify-modal");
+      const inp = document.getElementById("admin-verify-pin-input");
+      const err = document.getElementById("admin-verify-pin-error");
+      if (err) err.style.display = "none";
+      if (inp) {
+        inp.value = "";
+        setTimeout(() => inp.focus(), 50);
+      }
+      if (modal) modal.style.display = "flex";
+    }
+
+    function cerrarModalAdminPin() {
+      accionPendientePin = null;
+      const modal = document.getElementById("pin-verify-modal");
+      const err = document.getElementById("admin-verify-pin-error");
+      if (err) err.style.display = "none";
+      if (modal) modal.style.display = "none";
+    }
+
+    function confirmarVerificacionAdminPin() {
+      const inp = document.getElementById("admin-verify-pin-input");
+      const err = document.getElementById("admin-verify-pin-error");
+      const entered = String(inp ? inp.value : "").trim();
+
+      const adminRecord = (currentUserKey && USERS_CONFIG[currentUserKey])
+        ? USERS_CONFIG[currentUserKey]
+        : USERS_CONFIG["alexander04"];
+      const expectedPin = String((adminRecord && adminRecord.pin) || "").trim();
+
+      if (entered && expectedPin && entered === expectedPin) {
+        if (err) err.style.display = "none";
+        const cb = accionPendientePin;
+        cerrarModalAdminPin();
+        if (cb) cb();
+      } else {
+        if (err) err.style.display = "block";
+        if (inp) inp.focus();
+      }
+    }
+
+    function alternarVisibilidadPinesAdmin() {
+      if (pinesVisiblesPorAdmin) {
+        pinesVisiblesPorAdmin = false;
+        renderUsersTable();
+        return;
+      }
+      solicitarVerificacionAdminPin(() => {
+        pinesVisiblesPorAdmin = true;
+        renderUsersTable();
+      });
+    }
+
+    function renderUsersTable() {
+      const tbody = document.getElementById("users-table-body");
+      if (!tbody) return;
+
+      const itemsPermisos = [
+        ["ingresar", "Ingresar/Editar"],
+        ["pickear", "Pickear"],
+        ["global", "Inv. Global"],
+        ["movimientos", "Movimientos"],
+        ["excel", "Excel"],
+        ["eliminar", "Eliminar"],
+        ["usuarios", "Usuarios"]
+      ];
+
+      tbody.innerHTML = Object.keys(USERS_CONFIG).map(userKey => {
+        const u = USERS_CONFIG[userKey];
+        const pills = itemsPermisos
+          .filter(([k]) => !!u[k])
+          .map(([, label]) => `<span class="perm-pill">${label}</span>`)
+          .join("");
+
+        const checks = itemsPermisos
+          .map(([k, label]) => `
+            <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.78rem;margin-right:8px;cursor:pointer;">
+              <input type="checkbox" ${u[k] ? "checked" : ""} onchange="alternarPermisoUsuario('${userKey}', '${k}')"> ${label}
+            </label>
+          `).join("");
+
+        return `
+          <tr>
+            <td data-label="Usuario"><strong>${userKey}</strong></td>
+            <td data-label="PIN">
+              <span style="font-family:monospace; letter-spacing:2px; margin-right:6px;">${pinesVisiblesPorAdmin ? u.pin : "***"}</span>
+              <button type="button" class="btn-preset" style="padding:3px 7px; font-size:0.72rem;" onclick="alternarVisibilidadPinesAdmin()">${pinesVisiblesPorAdmin ? "🙈 Ocultar" : "👁️ Ver"}</button>
+            </td>
+            <td data-label="Rol / Perfil"><span class="badge badge-rack">${u.roleLabel || "Personalizado"}</span></td>
+            <td data-label="Permisos Activos"><div class="perm-pills">${pills || '<span class="perm-pill">Solo Visualizar</span>'}</div></td>
+            <td data-label="Modificar Permisos" style="flex-direction:column;align-items:flex-end;">
+              <div style="margin-bottom:6px;text-align:right;">${checks}</div>
+              <div class="preset-btns">
+                <button type="button" class="btn-preset" onclick="aplicarRolRapidoAUsuario('${userKey}', 'admin')">Admin</button>
+                <button type="button" class="btn-preset" onclick="aplicarRolRapidoAUsuario('${userKey}', 'solo_ingresar')">Solo Ingresar</button>
+                <button type="button" class="btn-preset" onclick="aplicarRolRapidoAUsuario('${userKey}', 'picker')">Pickear</button>
+                <button type="button" class="btn-preset" onclick="aplicarRolRapidoAUsuario('${userKey}', 'solo_movimientos')">Solo Movimientos</button>
+                <button type="button" class="btn-preset" onclick="aplicarRolRapidoAUsuario('${userKey}', 'guest')">Visualizar</button>
+              </div>
+            </td>
+            <td data-label="Acciones">
+              ${userKey !== "alexander04"
+                ? `<button type="button" class="btn-delete" onclick="eliminarUsuario('${userKey}')">🗑️</button>`
+                : `<span style="color:var(--text-muted);font-size:0.8rem;">Principal</span>`}
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
 
     // =========================================================================
     // BASE DE DATOS MAESTRA OFICIAL (Los 142 productos extraídos de EXPORTAR.xlsx)
@@ -1131,12 +2345,16 @@
 
     function intentarLogin() {
       const userSelect = document.getElementById('login-user').value;
-      const pin = document.getElementById('login-pin').value.trim();
+      const pin = String(document.getElementById('login-pin').value || '').trim();
       const errorDiv = document.getElementById('auth-error');
+      const u = USERS_CONFIG[userSelect];
 
-      if (USERS_CONFIG[userSelect] && USERS_CONFIG[userSelect].pin === pin) {
-        userRole = USERS_CONFIG[userSelect].role;
-        currentUserName = USERS_CONFIG[userSelect].displayName;
+      if (u && String(u.pin).trim() === pin) {
+        currentUserKey = userSelect;
+        currentUserPerms = { ...u };
+        userRole = u.role || (u.usuarios ? "admin" : (u.pickear ? "picker" : "guest"));
+        currentUserName = u.displayName || userSelect;
+        guardarSesionActiva();
         errorDiv.style.display = 'none';
         iniciarSesionExitosa();
       } else {
@@ -1144,14 +2362,67 @@
       }
     }
 
+    // Persistencia de sesión al recargar la página (hasta presionar Cerrar Sesión)
+    const STORAGE_SESSION_KEY = "wms_sesion_activa_v1";
+
+    function guardarSesionActiva() {
+      try {
+        localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify({
+          userKey: currentUserKey,
+          isGuest: userRole === "guest" && currentUserKey === "Visualización"
+        }));
+      } catch (e) {}
+    }
+
+    function limpiarSesionActiva() {
+      try {
+        localStorage.removeItem(STORAGE_SESSION_KEY);
+      } catch (e) {}
+    }
+
+    function restaurarSesionGuardada() {
+      try {
+        const raw = localStorage.getItem(STORAGE_SESSION_KEY);
+        if (!raw) return false;
+        const sess = JSON.parse(raw);
+        if (!sess) return false;
+
+        if (sess.isGuest || sess.userKey === "Visualización") {
+          currentUserKey = "Visualización";
+          currentUserPerms = { ...PERMISOS_PRESETS.guest };
+          userRole = "guest";
+          currentUserName = "Visualización";
+          iniciarSesionExitosa(true);
+          return true;
+        }
+
+        if (sess.userKey && USERS_CONFIG[sess.userKey]) {
+          const u = USERS_CONFIG[sess.userKey];
+          currentUserKey = sess.userKey;
+          currentUserPerms = { ...u };
+          userRole = u.role || (u.usuarios ? "admin" : (u.pickear ? "picker" : "guest"));
+          currentUserName = u.displayName || sess.userKey;
+          iniciarSesionExitosa(true);
+          return true;
+        }
+      } catch (e) {}
+      return false;
+    }
+
     function loginGuest() {
+      currentUserKey = "Visualización";
+      currentUserPerms = { ...PERMISOS_PRESETS.guest };
       userRole = "guest";
       currentUserName = "Visualización";
+      guardarSesionActiva();
       document.getElementById('auth-error').style.display = 'none';
       iniciarSesionExitosa();
     }
 
     function cerrarSesion() {
+      pinesVisiblesPorAdmin = false;
+      cerrarModalAdminPin();
+      limpiarSesionActiva();
       document.getElementById('login-user').selectedIndex = 0;
       document.getElementById('login-pin').value = '';
       document.getElementById('auth-error').style.display = 'none';
@@ -1159,33 +2430,51 @@
       document.getElementById('auth-overlay').style.display = 'flex';
     }
 
-    function iniciarSesionExitosa() {
-      document.getElementById('auth-overlay').style.display = 'none';
-      document.getElementById('app-container').style.display = 'block';
-      document.getElementById('current-user-label').textContent = currentUserName;
+    function aplicarVisibilidadPorPermisos() {
+      const p = currentUserPerms || {};
+      const rolTxt = p.roleLabel ? ` (${p.roleLabel})` : "";
+      document.getElementById('current-user-label').textContent = `${currentUserName}${rolTxt}`;
 
       const formWrapper = document.getElementById('form-panel-wrapper');
       const importExportSection = document.getElementById('import-export-section');
       const mainGrid = document.getElementById('main-content-grid');
       const btnNavPick = document.getElementById('btn-nav-pick');
+      const btnNavGlobal = document.getElementById('btn-nav-global');
+      const btnNavUsers = document.getElementById('btn-nav-users');
 
-      if (userRole === "admin") {
-        if (formWrapper) formWrapper.style.display = 'block';
-        if (importExportSection) importExportSection.style.display = 'block';
-        if (mainGrid) mainGrid.style.gridTemplateColumns = '360px 1fr';
-        if (btnNavPick) btnNavPick.style.display = 'inline-flex';
-      } else if (userRole === "picker") {
-        if (formWrapper) formWrapper.style.display = 'none';
-        if (importExportSection) importExportSection.style.display = 'none';
-        if (mainGrid) mainGrid.style.gridTemplateColumns = '1fr';
-        if (btnNavPick) btnNavPick.style.display = 'inline-flex';
+      const soloPick = isSoloPickerUser();
+      const soloMov = isSoloMovementsUser();
+      const soloView = isSoloViewerUser();
+      const canSeeMov = !!(p.movimientos || userRole === 'admin');
+      const btnNavHome = document.getElementById('btn-nav-home');
+      const btnNavMov = document.getElementById('btn-nav-movements');
+      const btnClosePick = document.querySelector('#pick-panel .btn-close-pick');
+      const btnCloseMov = document.getElementById('btn-close-movements-panel');
+
+      if (formWrapper) formWrapper.style.display = (!soloPick && !soloMov && p.ingresar) ? 'block' : 'none';
+      if (importExportSection) importExportSection.style.display = (!soloPick && !soloMov && p.excel) ? 'block' : 'none';
+      if (mainGrid) mainGrid.style.gridTemplateColumns = (!soloPick && !soloMov && p.ingresar) ? '360px 1fr' : '1fr';
+
+      if (btnNavHome) btnNavHome.style.display = (soloPick || soloMov) ? 'none' : 'inline-flex';
+      if (btnNavPick) btnNavPick.style.display = (!soloMov && p.pickear) ? 'inline-flex' : 'none';
+      if (btnNavGlobal) btnNavGlobal.style.display = (!soloPick && !soloMov && !soloView && p.global) ? 'inline-flex' : 'none';
+      if (btnNavMov) btnNavMov.style.display = (!soloPick && (soloMov || canSeeMov)) ? 'inline-flex' : 'none';
+      if (btnNavUsers) btnNavUsers.style.display = (!soloPick && !soloMov && p.usuarios) ? 'inline-flex' : 'none';
+      if (btnClosePick) btnClosePick.style.display = soloPick ? 'none' : 'inline-block';
+      if (btnCloseMov) btnCloseMov.style.display = soloMov ? 'none' : 'inline-block';
+    }
+
+    function iniciarSesionExitosa() {
+      document.getElementById('auth-overlay').style.display = 'none';
+      document.getElementById('app-container').style.display = 'block';
+      aplicarVisibilidadPorPermisos();
+      if (isSoloPickerUser()) {
+        goToPick();
+      } else if (isSoloMovementsUser()) {
+        goToMovementsTab();
       } else {
-        if (formWrapper) formWrapper.style.display = 'none';
-        if (importExportSection) importExportSection.style.display = 'none';
-        if (mainGrid) mainGrid.style.gridTemplateColumns = '1fr';
-        if (btnNavPick) btnNavPick.style.display = 'none';
+        render();
       }
-      render();
     }
 
     // Configuración de Firebase
@@ -1300,7 +2589,7 @@
       document.getElementById('prev-boxes').textContent = boxes;
       document.getElementById('prev-upb').textContent = upb;
       document.getElementById('prev-units').textContent = units;
-      document.getElementById('prev-total').textContent = total;
+      document.getElementById('prev-total').textContent = formatNum(total);
     }
 
     boxesInput.addEventListener('input', updateCalcPreview);
@@ -1310,6 +2599,257 @@
     let inventory = [];
     let movements = [];
     let currentTab = 'inventory';
+
+    // Sincronización en tiempo real de usuarios entre Laptop, Celular y PDT
+    db.ref('usuarios_sistema').on('value', (snapshot) => {
+      const remoteUsers = snapshot.val();
+      if (remoteUsers && typeof remoteUsers === 'object') {
+        const merged = JSON.parse(JSON.stringify(DEFAULT_USERS_CONFIG));
+        Object.keys(remoteUsers).forEach(k => {
+          const u = remoteUsers[k] || {};
+          merged[k] = {
+            pin: String(u.pin ?? '').trim(),
+            displayName: u.displayName || k,
+            roleLabel: u.roleLabel || (u.usuarios ? 'Admin' : (u.pickear ? 'Pickear' : 'Visualizar')),
+            role: u.role || (u.usuarios ? 'admin' : (u.pickear ? 'picker' : 'guest')),
+            ingresar: !!u.ingresar,
+            pickear: !!u.pickear,
+            global: u.global !== undefined ? !!u.global : true,
+            movimientos: u.movimientos !== undefined ? !!u.movimientos : (u.role === 'admin' || !!u.usuarios),
+            excel: !!u.excel,
+            eliminar: !!u.eliminar,
+            usuarios: !!u.usuarios
+          };
+        });
+        USERS_CONFIG = merged;
+        try {
+          localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(USERS_CONFIG));
+        } catch (e) {}
+        poblarSelectorLogin();
+        renderUsersTable();
+
+        // Si el usuario actual tiene sesión abierta y se actualizaron sus permisos desde otro equipo
+        if (currentUserKey && USERS_CONFIG[currentUserKey]) {
+          currentUserPerms = { ...USERS_CONFIG[currentUserKey] };
+          userRole = currentUserPerms.role;
+          aplicarVisibilidadPorPermisos();
+        } else if (document.getElementById('auth-overlay').style.display !== 'none') {
+          restaurarSesionGuardada();
+        }
+      } else {
+        // Si aún no existe el nodo en Firebase, subir la configuración local inicial
+        db.ref('usuarios_sistema').set(USERS_CONFIG);
+      }
+    });
+
+    let pickingOrders = {};
+    let activePickingOrderNumber = "";
+
+    function normalizarNumeroOrden(val) {
+      return String(val || "").trim().toUpperCase().replace(/[.#$\[\]\/]/g, "-");
+    }
+
+    function formatearFechaHoraExacta(dateObj) {
+      const d = dateObj || new Date();
+      const dia = String(d.getDate()).padStart(2, '0');
+      const mes = String(d.getMonth() + 1).padStart(2, '0');
+      const anio = d.getFullYear();
+      let horas = d.getHours();
+      const mins = String(d.getMinutes()).padStart(2, '0');
+      const segs = String(d.getSeconds()).padStart(2, '0');
+      const ampm = horas >= 12 ? 'p. m.' : 'a. m.';
+      horas = horas % 12;
+      horas = horas ? horas : 12;
+      return `${dia}/${mes}/${anio} a las ${String(horas).padStart(2, '0')}:${mins}:${segs} ${ampm}`;
+    }
+
+    // Sincronización en tiempo real de órdenes de picking entre Laptop, Celular y PDT
+    db.ref('picking_orders').on('value', (snapshot) => {
+      pickingOrders = snapshot.val() || {};
+      verificarEstadoOrdenPicking();
+      renderPickingSessionSummary();
+    });
+
+    function verificarEstadoOrdenPicking() {
+      const inputEl = document.getElementById('pick-order-number');
+      const banner = document.getElementById('pick-order-status-banner');
+      const pickForm = document.getElementById('pick-form');
+      const btnStart = document.getElementById('btn-start-pick-order');
+      const btnFinish = document.getElementById('btn-finish-pick-order');
+      const btnRelease = document.getElementById('btn-release-pick-order');
+      if (!inputEl || !banner || !pickForm) return;
+
+      const orderNum = normalizarNumeroOrden(inputEl.value);
+
+      if (!orderNum) {
+        banner.className = 'pick-order-alert';
+        banner.textContent = '';
+        pickForm.classList.add('pick-fields-locked');
+        btnStart.style.display = 'inline-block';
+        btnStart.disabled = false;
+        btnFinish.style.display = 'none';
+        btnRelease.style.display = 'none';
+        inputEl.readOnly = false;
+        return;
+      }
+
+      const record = pickingOrders[orderNum];
+
+      // Caso 1: La orden ya fue pickeada y cerrada
+      if (record && record.status === 'completed') {
+        const quien = record.completedBy || record.user || 'Otro usuario';
+        const cuando = record.completedAtText || 'fecha no registrada';
+        banner.className = 'pick-order-alert already-completed';
+        banner.innerHTML = `⛔ Este picking (<strong>#${orderNum}</strong>) ya fue pickeado por <strong>${quien}</strong> el <strong>${cuando}</strong>.`;
+        pickForm.classList.add('pick-fields-locked');
+        btnStart.style.display = 'inline-block';
+        btnStart.disabled = true;
+        btnFinish.style.display = 'none';
+        btnRelease.style.display = 'none';
+        inputEl.readOnly = false;
+        if (activePickingOrderNumber === orderNum) activePickingOrderNumber = "";
+        return;
+      }
+
+      // Caso 2: La orden está siendo pickeada actualmente
+      if (record && record.status === 'in_progress') {
+        const esMia = (record.userKey && currentUserKey && record.userKey === currentUserKey) ||
+                      (record.user && record.user === currentUserName);
+
+        if (esMia) {
+          activePickingOrderNumber = orderNum;
+          const desde = record.startedAtText || '';
+          banner.className = 'pick-order-alert active-mine';
+          banner.innerHTML = `✅ Orden <strong>#${orderNum}</strong> asignada a ti (<strong>${currentUserName}</strong>)${desde ? ' desde el ' + desde : ''}. Puedes registrar salidas y al terminar presiona <strong>"Finalizar Orden"</strong>.`;
+          pickForm.classList.remove('pick-fields-locked');
+          btnStart.style.display = 'none';
+          btnFinish.style.display = 'inline-block';
+          btnRelease.style.display = 'inline-block';
+          inputEl.readOnly = true;
+        } else {
+          const quien = record.user || 'Otro usuario';
+          const desde = record.startedAtText ? ` (inició el ${record.startedAtText})` : '';
+          banner.className = 'pick-order-alert in-progress-other';
+          banner.innerHTML = `⚠️ <strong>${quien}</strong> está pickeando actualmente la orden <strong>#${orderNum}</strong>${desde}. No se permite pickear esta orden hasta que finalice o la libere.`;
+          pickForm.classList.add('pick-fields-locked');
+          btnStart.style.display = 'inline-block';
+          btnStart.disabled = true;
+          btnFinish.style.display = 'none';
+          btnRelease.style.display = 'none';
+          inputEl.readOnly = false;
+        }
+        return;
+      }
+
+      // Caso 3: Orden libre / nueva lista para tomar
+      banner.className = 'pick-order-alert';
+      banner.textContent = '';
+      pickForm.classList.add('pick-fields-locked');
+      btnStart.style.display = 'inline-block';
+      btnStart.disabled = false;
+      btnFinish.style.display = 'none';
+      btnRelease.style.display = 'none';
+      inputEl.readOnly = false;
+    }
+
+    function iniciarOrdenPicking() {
+      if (!currentUserPerms.pickear) {
+        alert('No tienes permiso para pickear.');
+        return;
+      }
+      const inputEl = document.getElementById('pick-order-number');
+      const orderNum = normalizarNumeroOrden(inputEl.value);
+      if (!orderNum) {
+        alert('Por favor ingresa el número de picking / orden antes de empezar (ej: 286298).');
+        inputEl.focus();
+        return;
+      }
+      inputEl.value = orderNum;
+
+      const existing = pickingOrders[orderNum];
+      if (existing) {
+        if (existing.status === 'completed') {
+          verificarEstadoOrdenPicking();
+          alert(`Este picking (#${orderNum}) ya fue pickeado por ${existing.completedBy || existing.user} el ${existing.completedAtText}.`);
+          return;
+        }
+        if (existing.status === 'in_progress') {
+          const esMia = (existing.userKey && currentUserKey && existing.userKey === currentUserKey) ||
+                        (existing.user && existing.user === currentUserName);
+          if (!esMia) {
+            verificarEstadoOrdenPicking();
+            alert(`${existing.user} está pickeando esta orden (#${orderNum}) y no puedes pickearla.`);
+            return;
+          }
+        }
+      }
+
+      const ahoraTexto = formatearFechaHoraExacta(new Date());
+      const orderData = {
+        orderNumber: orderNum,
+        status: 'in_progress',
+        user: currentUserName,
+        userKey: currentUserKey || currentUserName,
+        startedAt: Date.now(),
+        startedAtText: ahoraTexto,
+        itemsPicked: (existing && existing.itemsPicked) ? existing.itemsPicked : 0
+      };
+
+      activePickingOrderNumber = orderNum;
+      pickingOrders[orderNum] = orderData;
+      db.ref('picking_orders/' + orderNum).set(orderData);
+      verificarEstadoOrdenPicking();
+    }
+
+    function finalizarOrdenPicking() {
+      const orderNum = activePickingOrderNumber || normalizarNumeroOrden(document.getElementById('pick-order-number').value);
+      if (!orderNum) return;
+
+      const existing = pickingOrders[orderNum] || {};
+      const itemsCount = existing.itemsPicked || 0;
+      if (itemsCount === 0) {
+        const ok = confirm(`Aún no has descontado ningún producto en la orden #${orderNum}. ¿Seguro que deseas marcarla como ya pickeada?`);
+        if (!ok) return;
+      }
+
+      const ahoraTexto = formatearFechaHoraExacta(new Date());
+      const completedData = {
+        ...existing,
+        orderNumber: orderNum,
+        status: 'completed',
+        completedBy: currentUserName,
+        completedByKey: currentUserKey || currentUserName,
+        completedAt: Date.now(),
+        completedAtText: ahoraTexto
+      };
+
+      pickingOrders[orderNum] = completedData;
+      db.ref('picking_orders/' + orderNum).set(completedData);
+
+      activePickingOrderNumber = "";
+      document.getElementById('pick-order-number').readOnly = false;
+      verificarEstadoOrdenPicking();
+      showSuccessToast();
+    }
+
+    function liberarOrdenPicking() {
+      const orderNum = activePickingOrderNumber || normalizarNumeroOrden(document.getElementById('pick-order-number').value);
+      if (!orderNum) return;
+      const existing = pickingOrders[orderNum];
+      if (!existing) return;
+
+      if ((existing.itemsPicked || 0) > 0) {
+        const ok = confirm(`Ya descontaste ${existing.itemsPicked} línea(s) en la orden #${orderNum}. Si la liberas, otro usuario podrá continuar pickeándola. ¿Deseas liberarla?`);
+        if (!ok) return;
+      }
+
+      db.ref('picking_orders/' + orderNum).remove();
+      delete pickingOrders[orderNum];
+      activePickingOrderNumber = "";
+      document.getElementById('pick-order-number').readOnly = false;
+      document.getElementById('pick-order-number').value = "";
+      verificarEstadoOrdenPicking();
+    }
 
     // Sincronización en tiempo real de inventario
     db.ref('inventario').on('value', (snapshot) => {
@@ -1330,16 +2870,17 @@
         movements = [];
       }
       renderMovements();
+      renderPickingSessionSummary();
     });
 
     function saveToFirebase() {
-      if (userRole !== "admin") return;
+      if (!currentUserPerms.ingresar && !currentUserPerms.pickear && !currentUserPerms.eliminar && userRole !== "admin") return;
       const inventoryObj = {};
       inventory.forEach(item => { inventoryObj[item.id] = item; });
       db.ref('inventario').set(inventoryObj);
     }
 
-    function addMovementLog(type, location, sap, description, boxes, units) {
+    function addMovementLog(type, location, sap, description, boxes, units, pickingOrder = "") {
       if (userRole === "guest") return;
       const now = new Date().toLocaleString();
       const uniqueId = 'mov_' + Date.now();
@@ -1347,6 +2888,7 @@
         id: uniqueId,
         date: now,
         type: type,
+        pickingOrder: pickingOrder || "-",
         user: currentUserName,
         location: location,
         sap: sap,
@@ -1412,6 +2954,8 @@
           document.getElementById('unitsPerBox').value = found.unitsPerBox;
         }
         updateCalcPreview();
+    document.getElementById('pick-boxes')?.addEventListener('input', updatePickRemainingPreview);
+    document.getElementById('pick-units')?.addEventListener('input', updatePickRemainingPreview);
       }
     }
 
@@ -1466,44 +3010,172 @@
     }
 
     // NAVEGACIÓN SUPERIOR
-    function goToHome() {
-      document.getElementById('pick-panel').style.display = 'none';
-      document.getElementById('global-panel').style.display = 'none';
-      document.getElementById('main-content-grid').style.display = userRole === "admin" ? 'grid' : 'none';
-      
-      document.getElementById('btn-nav-home').className = 'btn-nav active-home';
+    function isSoloPickerUser() {
+      const p = currentUserPerms || {};
+      return !!(p.pickear && !p.ingresar && !p.usuarios && !p.excel && !p.eliminar && userRole !== 'admin');
+    }
+
+    function isSoloMovementsUser() {
+      const p = currentUserPerms || {};
+      return !!(p.movimientos && !p.ingresar && !p.pickear && !p.global && !p.usuarios && !p.excel && !p.eliminar && userRole !== 'admin');
+    }
+
+    function isSoloViewerUser() {
+      const p = currentUserPerms || {};
+      return !isSoloMovementsUser() && !!(userRole === 'guest' || (!p.pickear && !p.ingresar && !p.usuarios && !p.excel && !p.eliminar));
+    }
+
+    function resetNavClasses() {
+      document.getElementById('btn-nav-home').className = 'btn-nav';
       document.getElementById('btn-nav-pick').className = 'btn-nav';
       document.getElementById('btn-nav-global').className = 'btn-nav';
+      const btnMov = document.getElementById('btn-nav-movements');
+      if (btnMov) btnMov.className = 'btn-nav';
+      const btnUsers = document.getElementById('btn-nav-users');
+      if (btnUsers) btnUsers.className = 'btn-nav';
+    }
+
+    function hideAllMainPanels() {
+      document.getElementById('pick-panel').style.display = 'none';
+      document.getElementById('global-panel').style.display = 'none';
+      const movPanel = document.getElementById('movements-panel');
+      if (movPanel) movPanel.style.display = 'none';
+      const usersPanel = document.getElementById('users-panel');
+      if (usersPanel) usersPanel.style.display = 'none';
+      document.getElementById('main-content-grid').style.display = 'none';
+    }
+
+    function goToHome() {
+      if (isSoloPickerUser()) {
+        goToPick();
+        return;
+      }
+      if (isSoloMovementsUser()) {
+        goToMovementsTab();
+        return;
+      }
+      hideAllMainPanels();
+      document.getElementById('main-content-grid').style.display = (currentUserPerms.ingresar || userRole === 'admin') ? 'grid' : 'none';
+      setSecondarySectionsInUsersMode(false, false);
+
+      resetNavClasses();
+      document.getElementById('btn-nav-home').className = 'btn-nav active-home';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function goToPick() {
-      if (userRole === "guest") {
-        alert('Modo Visualización: No tienes permisos para realizar salidas o picking.');
+      if (!currentUserPerms.pickear) {
+        alert('No tienes permiso para realizar salidas o picking.');
         return;
       }
+      hideAllMainPanels();
       document.getElementById('pick-panel').style.display = 'block';
-      document.getElementById('global-panel').style.display = 'none';
-      document.getElementById('main-content-grid').style.display = 'none';
-      
-      document.getElementById('btn-nav-home').className = 'btn-nav';
+      setSecondarySectionsInUsersMode(false, isSoloPickerUser());
+
+      resetNavClasses();
       document.getElementById('btn-nav-pick').className = 'btn-nav active-pick';
-      document.getElementById('btn-nav-global').className = 'btn-nav';
-      
+
       populatePickDatalist();
+      renderPickingSessionSummary();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function goToGlobalInventory() {
+      if (isSoloPickerUser()) {
+        goToPick();
+        return;
+      }
+      if (!currentUserPerms.global) {
+        alert('No tienes permiso para ver el Inventario Global.');
+        return;
+      }
+      hideAllMainPanels();
       document.getElementById('global-panel').style.display = 'block';
-      document.getElementById('pick-panel').style.display = 'none';
-      document.getElementById('main-content-grid').style.display = 'none';
+      setSecondarySectionsInUsersMode(true, false);
 
-      document.getElementById('btn-nav-home').className = 'btn-nav';
-      document.getElementById('btn-nav-pick').className = 'btn-nav';
+      resetNavClasses();
       document.getElementById('btn-nav-global').className = 'btn-nav active-global';
 
       renderGlobalInventory();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToMovementsTab() {
+      if (isSoloPickerUser()) {
+        goToPick();
+        return;
+      }
+      const p = currentUserPerms || {};
+      if (!p.movimientos && userRole !== 'admin') {
+        alert('No tienes permiso para ver la pestaña de Movimientos.');
+        return;
+      }
+      hideAllMainPanels();
+      const movPanel = document.getElementById('movements-panel');
+      if (movPanel) movPanel.style.display = 'block';
+      setSecondarySectionsInUsersMode(true, false);
+
+      const btnCloseMov = document.getElementById('btn-close-movements-panel');
+      if (btnCloseMov) btnCloseMov.style.display = isSoloMovementsUser() ? 'none' : 'inline-block';
+
+      resetNavClasses();
+      const btnMov = document.getElementById('btn-nav-movements');
+      if (btnMov) btnMov.className = 'btn-nav active-home';
+
+      renderMovements();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    let isPickingOnlyMode = false;
+
+    function setSecondarySectionsInUsersMode(hide, pickingOnly = false) {
+      isPickingOnlyMode = !!(hide || pickingOnly);
+      const hideAllBelow = !!(hide || pickingOnly);
+      const statsGrid = document.querySelector('.stats-grid');
+      const importExportSection = document.getElementById('import-export-section');
+      const tabsHeader = document.querySelector('.tabs-header');
+      const tableTools = document.querySelector('.table-tools');
+      const tableInv = document.getElementById('table-inventory-container');
+      const tableMov = document.getElementById('table-movements-container');
+
+      if (statsGrid) statsGrid.style.display = hideAllBelow ? 'none' : '';
+      if (importExportSection) {
+        importExportSection.style.display = (!hideAllBelow && currentUserPerms.excel) ? 'block' : 'none';
+      }
+      if (tabsHeader) tabsHeader.style.display = hideAllBelow ? 'none' : '';
+      if (tableTools) tableTools.style.display = hideAllBelow ? 'none' : '';
+      const isHomeEntryView = (!hideAllBelow && document.getElementById('main-content-grid')?.style.display !== 'none');
+      if (hideAllBelow || isHomeEntryView) {
+        if (tabsHeader) tabsHeader.style.display = 'none';
+        if (tableTools) tableTools.style.display = 'none';
+        if (tableInv) tableInv.style.display = 'none';
+        if (tableMov) tableMov.style.display = 'none';
+      } else {
+        if (currentTab === 'inventory') {
+          if (tableInv) tableInv.style.display = 'block';
+          if (tableMov) tableMov.style.display = 'none';
+        } else {
+          if (tableInv) tableInv.style.display = 'none';
+          if (tableMov) tableMov.style.display = 'block';
+        }
+      }
+    }
+
+    function goToUsers() {
+      if (!currentUserPerms.usuarios) {
+        alert('Solo usuarios con permiso de administración de usuarios pueden entrar aquí.');
+        return;
+      }
+      document.getElementById('users-panel').style.display = 'block';
+      document.getElementById('pick-panel').style.display = 'none';
+      document.getElementById('global-panel').style.display = 'none';
+      document.getElementById('main-content-grid').style.display = 'none';
+      setSecondarySectionsInUsersMode(true);
+
+      resetNavClasses();
+      document.getElementById('btn-nav-users').className = 'btn-nav active-users';
+
+      renderUsersTable();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1651,7 +3323,7 @@
           let actionsHtml = '';
           if (userRole === "admin") {
             actionsHtml = `
-              <td>
+              <td data-label="Acciones">
                 <div class="actions">
                   <button class="btn-edit" onclick="editProduct(${item.id})">Editar</button>
                   <button class="btn-delete" onclick="deleteProduct(${item.id})">Eliminar</button>
@@ -1661,15 +3333,15 @@
           }
 
           tr.innerHTML = `
-            <td><span class="badge ${badgeClass}">${item.location}</span></td>
-            <td><strong>${item.sap}</strong></td>
-            <td>${item.barcode}</td>
-            <td>${item.description}</td>
-            <td>${item.boxes}</td>
-            <td>${item.units}</td>
-            <td>Caja de ${item.unitsPerBox} unids.</td>
-            <td><strong style="color: #38bdf8;">${item.totalUnits} unids.</strong></td>
-            <td>${isCritical ? '<span class="badge badge-critical">⚠️ CRÍTICO</span>' : '<span class="badge badge-entrada">ÓPTIMO</span>'}</td>
+            <td data-label="Ubicación"><span class="badge ${badgeClass}">${item.location}</span></td>
+            <td data-label="Código SAP"><strong>${item.sap}</strong></td>
+            <td data-label="Código Barras">${item.barcode}</td>
+            <td data-label="Descripción">${item.description}</td>
+            <td data-label="Cajas">${item.boxes}</td>
+            <td data-label="Sueltas">${item.units}</td>
+            <td data-label="Presentación">Caja de ${item.unitsPerBox} unids.</td>
+            <td data-label="Total Unidades"><strong style="color: #38bdf8;">${formatNum(item.totalUnits)} unids.</strong></td>
+            <td data-label="Estado">${isCritical ? '<span class="badge badge-critical">⚠️ CRÍTICO</span>' : '<span class="badge badge-entrada">ÓPTIMO</span>'}</td>
             ${actionsHtml}
           `;
           list.appendChild(tr);
@@ -1690,7 +3362,7 @@
     if (form) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        if (userRole !== "admin") return;
+        if (!currentUserPerms.ingresar && userRole !== "admin") return;
         const editingId = document.getElementById('editing-id').value;
         const boxes = parseInt(boxesInput.value) || 0;
         const upb = parseInt(upbInput.value) || 12;
@@ -1753,18 +3425,167 @@
       });
     }
 
-    function onPickSearchInput() {
-      const val = document.getElementById('pick-search-input').value.trim();
-      const item = inventory.find(i => `[${i.location}] ${i.description} (SAP: ${i.sap})` === val);
-      
-      if (item) {
-        document.getElementById('pick-selected-id').value = item.id;
-        document.getElementById('pick-location').value = item.location;
-        document.getElementById('pick-stock-info').value = `${item.boxes} Cajas / ${item.units} Sueltas (Total: ${item.totalUnits} unids)`;
-      } else {
+    function selectPickItemById(id) {
+      const item = inventory.find(i => i.id === id);
+      const hintEl = document.getElementById('pick-multi-loc-hint');
+      if (!item) {
         document.getElementById('pick-selected-id').value = '';
         document.getElementById('pick-location').value = '';
         document.getElementById('pick-stock-info').value = '';
+        if (hintEl) { hintEl.style.display = 'none'; hintEl.innerHTML = ''; }
+        updatePickRemainingPreview();
+        return;
+      }
+
+      document.getElementById('pick-search-input').value = `[${item.location}] ${item.description} (SAP: ${item.sap})`;
+      document.getElementById('pick-selected-id').value = item.id;
+      document.getElementById('pick-location').value = item.location;
+      document.getElementById('pick-stock-info').value = `${item.boxes} Cajas / ${item.units} Sueltas (Total: ${formatNum(item.totalUnits)} unids)`;
+
+      // Mostrar si el mismo SKU/descripción existe en otras ubicaciones
+      const sameSkuItems = inventory.filter(i =>
+        i.id !== item.id &&
+        ((item.sap && i.sap && i.sap.toLowerCase() === item.sap.toLowerCase()) ||
+         (item.description && i.description && i.description.toLowerCase() === item.description.toLowerCase()))
+      );
+
+      if (hintEl) {
+        if (sameSkuItems.length > 0) {
+          const btns = sameSkuItems.map(other =>
+            `<button type="button" onclick="selectPickItemById(${other.id})">${other.location} (${formatNum(other.totalUnits)} u)</button>`
+          ).join('');
+          hintEl.innerHTML = `📍 También disponible en: ${btns}`;
+          hintEl.style.display = 'block';
+        } else {
+          hintEl.style.display = 'none';
+          hintEl.innerHTML = '';
+        }
+      }
+
+      updatePickRemainingPreview();
+    }
+
+    function onPickSearchInput() {
+      const val = document.getElementById('pick-search-input').value.trim();
+      const hintEl = document.getElementById('pick-multi-loc-hint');
+      if (!val) {
+        selectPickItemById(null);
+        return;
+      }
+
+      // 1) Coincidencia exacta con formato del datalist
+      let item = inventory.find(i => `[${i.location}] ${i.description} (SAP: ${i.sap})` === val);
+
+      // 2) Coincidencia exacta por código de barras o SAP
+      if (!item) {
+        const low = val.toLowerCase();
+        item = inventory.find(i =>
+          (i.barcode && i.barcode !== 'N/A' && i.barcode.toLowerCase() === low) ||
+          (i.sap && i.sap.toLowerCase() === low)
+        );
+      }
+
+      if (item) {
+        selectPickItemById(item.id);
+        return;
+      }
+
+      // 3) Búsqueda multi-palabra para mostrar sugerencias rápidas de ubicaciones si hay varias
+      const terms = val.toLowerCase().split(/\s+/).filter(Boolean);
+      const matches = inventory.filter(i => {
+        const hay = `${i.location || ''} ${i.sap || ''} ${i.barcode || ''} ${i.description || ''}`.toLowerCase();
+        return terms.every(t => hay.includes(t));
+      });
+
+      document.getElementById('pick-selected-id').value = '';
+      document.getElementById('pick-location').value = '';
+      document.getElementById('pick-stock-info').value = '';
+
+      if (hintEl) {
+        if (matches.length > 0 && matches.length <= 6) {
+          const btns = matches.map(m =>
+            `<button type="button" onclick="selectPickItemById(${m.id})">[${m.location}] ${m.sap} (${formatNum(m.totalUnits)} u)</button>`
+          ).join('');
+          hintEl.innerHTML = `Coincidencias rápidas: ${btns}`;
+          hintEl.style.display = 'block';
+        } else {
+          hintEl.style.display = 'none';
+          hintEl.innerHTML = '';
+        }
+      }
+      updatePickRemainingPreview();
+    }
+
+    function updatePickRemainingPreview() {
+      const remEl = document.getElementById('pick-rem-text');
+      if (!remEl) return;
+      const selectedId = Number(document.getElementById('pick-selected-id').value);
+      const item = inventory.find(i => i.id === selectedId);
+      if (!item) {
+        remEl.className = 'pick-preview-rem';
+        remEl.textContent = 'Selecciona un producto y cantidad';
+        return;
+      }
+      const bSub = parseInt(document.getElementById('pick-boxes').value) || 0;
+      const uSub = parseInt(document.getElementById('pick-units').value) || 0;
+      const stockTot = (item.boxes * item.unitsPerBox) + item.units;
+      const reqTot = (bSub * item.unitsPerBox) + uSub;
+      const remTot = stockTot - reqTot;
+
+      remEl.className = 'pick-preview-rem';
+      if (reqTot <= 0) {
+        remEl.textContent = `Actual: ${formatNum(stockTot)} unids. (${item.boxes} c / ${item.units} s)`;
+      } else if (remTot < 0) {
+        remEl.classList.add('is-zero');
+        remEl.textContent = `⚠️ Excede stock disponible (${formatNum(stockTot)} unids.)`;
+      } else if (remTot === 0) {
+        remEl.classList.add('is-zero');
+        remEl.textContent = `0 unids. (Dejará la ubicación vacía)`;
+      } else {
+        const minS = item.minStock !== undefined ? item.minStock : 12;
+        if (remTot <= minS) remEl.classList.add('is-crit');
+        remEl.textContent = `${formatNum(remTot)} unids. restantes`;
+      }
+    }
+
+    function renderPickingSessionSummary() {
+      const bar = document.getElementById('pick-session-bar');
+      const itemsCard = document.getElementById('pick-order-items-card');
+      const itemsList = document.getElementById('pick-order-items-list');
+      const itemsCountEl = document.getElementById('pick-order-items-count');
+      if (!bar) return;
+
+      const orderNum = activePickingOrderNumber || normalizarNumeroOrden(document.getElementById('pick-order-number')?.value || '');
+      const rec = orderNum ? pickingOrders[orderNum] : null;
+
+      if (orderNum && rec && rec.status === 'in_progress') {
+        bar.classList.add('active');
+        document.getElementById('pick-live-order').textContent = `#${orderNum}`;
+        document.getElementById('pick-live-user').textContent = rec.user || currentUserName;
+        document.getElementById('pick-live-lines').textContent = rec.itemsPicked || 0;
+      } else {
+        bar.classList.remove('active');
+      }
+
+      if (itemsCard && itemsList && itemsCountEl) {
+        const orderMovs = orderNum
+          ? movements.filter(m => m.type === 'SALIDA' && normalizarNumeroOrden(m.pickingOrder) === orderNum)
+          : [];
+        if (orderNum && rec && rec.status === 'in_progress' && orderMovs.length > 0) {
+          itemsCard.classList.add('has-items');
+          itemsCountEl.textContent = `${orderMovs.length} salida(s)`;
+          itemsList.innerHTML = orderMovs.map(m => `
+            <div class="pick-item-row">
+              <div>
+                <strong>${m.location}</strong> · ${m.description} <span style="color:var(--text-muted);">(${m.sap})</span>
+              </div>
+              <div class="pick-item-qty">-${m.detail}</div>
+            </div>
+          `).join('');
+        } else {
+          itemsCard.classList.remove('has-items');
+          itemsList.innerHTML = '';
+        }
       }
     }
 
@@ -1780,12 +3601,25 @@
         document.getElementById('pick-search-input').value = textVal;
         document.getElementById('pick-selected-id').value = item.id;
         document.getElementById('pick-location').value = item.location;
-        document.getElementById('pick-stock-info').value = `${item.boxes} Cajas / ${item.units} Sueltas (Total: ${item.totalUnits} unids)`;
+        document.getElementById('pick-stock-info').value = `${item.boxes} Cajas / ${item.units} Sueltas (Total: ${formatNum(item.totalUnits)} unids)`;
       }
     }
 
     function confirmarSalidaDirecta() {
-      if (userRole === "guest") return;
+      if (!currentUserPerms.pickear) return;
+
+      const orderNum = activePickingOrderNumber || normalizarNumeroOrden(document.getElementById('pick-order-number').value);
+      const orderRec = orderNum ? pickingOrders[orderNum] : null;
+      const esMia = orderRec && orderRec.status === 'in_progress' &&
+                    ((orderRec.userKey && currentUserKey && orderRec.userKey === currentUserKey) ||
+                     (orderRec.user && orderRec.user === currentUserName));
+
+      if (!orderNum || !esMia) {
+        alert('Debes ingresar el número de picking (ej: 286298) y presionar "Iniciar Picking" antes de descontar productos.');
+        document.getElementById('pick-order-number').focus();
+        return;
+      }
+
       const selectedId = Number(document.getElementById('pick-selected-id').value);
       
       if (!selectedId) {
@@ -1795,6 +3629,11 @@
 
       const boxesToSub = parseInt(document.getElementById('pick-boxes').value) || 0;
       const unitsToSub = parseInt(document.getElementById('pick-units').value) || 0;
+
+      if (boxesToSub <= 0 && unitsToSub <= 0) {
+        alert('Ingresa al menos 1 caja o 1 unidad suelta para retirar.');
+        return;
+      }
 
       const item = inventory.find(i => i.id === selectedId);
       if (!item) return;
@@ -1823,7 +3662,16 @@
         return;
       }
 
-      addMovementLog('SALIDA', item.location, item.sap, item.description, boxesToSub, unitsToSub);
+      addMovementLog('SALIDA', item.location, item.sap, item.description, boxesToSub, unitsToSub, orderNum);
+
+      // Incrementar contador de líneas pickeadas en la orden
+      const updatedOrder = {
+        ...orderRec,
+        itemsPicked: (orderRec.itemsPicked || 0) + 1,
+        lastUpdatedAt: Date.now()
+      };
+      pickingOrders[orderNum] = updatedOrder;
+      db.ref('picking_orders/' + orderNum).set(updatedOrder);
 
       const newTotal = (currentBoxes * item.unitsPerBox) + currentUnits;
 
@@ -1836,13 +3684,9 @@
         inventory = inventory.map(i => i.id === selectedId ? item : i);
       }
 
-      if (userRole === "picker") {
-        const inventoryObj = {};
-        inventory.forEach(prod => { inventoryObj[prod.id] = prod; });
-        db.ref('inventario').set(inventoryObj);
-      } else {
-        saveToFirebase();
-      }
+      const inventoryObj = {};
+      inventory.forEach(prod => { inventoryObj[prod.id] = prod; });
+      db.ref('inventario').set(inventoryObj);
 
       document.getElementById('pick-search-input').value = "";
       document.getElementById('pick-selected-id').value = "";
@@ -1852,8 +3696,9 @@
       document.getElementById('pick-units').value = "";
 
       populatePickDatalist();
-      showSuccessToast(); 
-      switchTab('movements');
+      updatePickRemainingPreview();
+      renderPickingSessionSummary();
+      showSuccessToast();
     }
 
     function editProduct(id) {
@@ -1901,9 +3746,39 @@
       document.getElementById('units').value = '';
     }
 
+    function updateInspector(loc) {
+      const titleEl = document.getElementById('inspector-title');
+      const subEl = document.getElementById('inspector-sub');
+      const badgeEl = document.getElementById('inspector-badge');
+      if (!titleEl || !subEl || !badgeEl) return;
+
+      if (isCageLocation(loc)) {
+        const itemsInCage = inventory.filter(i => i.location === loc);
+        const totalUnidsJaula = itemsInCage.reduce((acc, i) => acc + (Number(i.totalUnits) || 0), 0);
+        titleEl.textContent = loc.replace('JAULA-', 'JAULA ');
+        subEl.textContent = `${itemsInCage.length}/${MAX_CAGE_REFS} referencias · ${formatNum(totalUnidsJaula)} unids.`;
+        badgeEl.className = 'loc-inspector-pill pill-cage';
+        badgeEl.textContent = 'JAULA';
+        return;
+      }
+
+      const itemInLoc = inventory.find(i => i.location === loc);
+      titleEl.textContent = loc;
+      if (itemInLoc) {
+        subEl.textContent = `${itemInLoc.description} (${itemInLoc.sap}) · ${formatNum(itemInLoc.totalUnits)} unids.`;
+        badgeEl.className = 'loc-inspector-pill pill-busy';
+        badgeEl.textContent = 'OCUPADA';
+      } else {
+        subEl.textContent = 'Posición libre lista para ingreso de mercancía';
+        badgeEl.className = 'loc-inspector-pill pill-free';
+        badgeEl.textContent = 'DISPONIBLE';
+      }
+    }
+
     function renderMap() {
       const visualMap = document.getElementById('visual-map');
       const rackFilter = document.getElementById('map-rack-filter') ? document.getElementById('map-rack-filter').value : '';
+      const selectedLoc = document.getElementById('filter-location') ? document.getElementById('filter-location').value : '';
       if (!visualMap) return;
       visualMap.innerHTML = '';
 
@@ -1918,6 +3793,9 @@
       filteredLocations.forEach(loc => {
         const cell = document.createElement('div');
         cell.className = 'map-cell';
+        if (selectedLoc && selectedLoc === loc) {
+          cell.classList.add('is-selected');
+        }
 
         if (isCageLocation(loc)) {
           const itemsInCage = inventory.filter(i => i.location === loc);
@@ -1946,7 +3824,9 @@
           cell.title = `Ubicación: ${loc} (Haz clic para seleccionar/filtrar)`;
         }
 
+        cell.onmouseenter = () => updateInspector(loc);
         cell.onclick = () => {
+          updateInspector(loc);
           goToHome();
           document.getElementById('location').value = loc;
           document.getElementById('filter-location').value = loc;
@@ -1996,7 +3876,7 @@
           let actionsHtml = '';
           if (userRole === "admin") {
             actionsHtml = `
-              <td>
+              <td data-label="Acciones">
                 <div class="actions">
                   <button class="btn-edit" onclick="editProduct(${item.id})">Editar</button>
                   <button class="btn-delete" onclick="deleteProduct(${item.id})">Eliminar</button>
@@ -2006,14 +3886,14 @@
           }
 
           tr.innerHTML = `
-            <td><span class="badge ${badgeClass}">${item.location}</span></td>
-            <td><strong>${item.sap}</strong></td>
-            <td>${item.barcode}</td>
-            <td>${item.description}</td>
-            <td>${item.boxes}</td>
-            <td>${item.unitsPerBox}</td>
-            <td>${item.units}</td>
-            <td><strong style="color: #38bdf8;">${item.totalUnits} unids.</strong></td>
+            <td data-label="Ubicación"><span class="badge ${badgeClass}">${item.location}</span></td>
+            <td data-label="Código SAP"><strong>${item.sap}</strong></td>
+            <td data-label="Código Barras">${item.barcode}</td>
+            <td data-label="Descripción">${item.description}</td>
+            <td data-label="Cajas">${item.boxes}</td>
+            <td data-label="Unid/Caja">${item.unitsPerBox}</td>
+            <td data-label="Sueltas">${item.units}</td>
+            <td data-label="Total Unids"><strong style="color: #38bdf8;">${formatNum(item.totalUnits)} unids.</strong></td>
             ${actionsHtml}
           `;
           list.appendChild(tr);
@@ -2035,11 +3915,11 @@
         return item.totalUnits <= minS;
       }).length;
 
-      document.getElementById('total-skus').textContent = totalSkus;
-      document.getElementById('total-cajas').textContent = totalBoxes;
-      document.getElementById('total-sueltas').textContent = totalUnits;
-      document.getElementById('total-global').textContent = totalGlobal;
-      document.getElementById('total-criticos').textContent = totalCritical;
+      document.getElementById('total-skus').textContent = formatNum(totalSkus);
+      document.getElementById('total-cajas').textContent = formatNum(totalBoxes);
+      document.getElementById('total-sueltas').textContent = formatNum(totalUnits);
+      document.getElementById('total-global').textContent = formatNum(totalGlobal);
+      document.getElementById('total-criticos').textContent = formatNum(totalCritical);
 
       const statCardCrit = document.getElementById('stat-card-criticos');
       if (totalCritical > 0) {
@@ -2051,32 +3931,56 @@
 
     function renderMovements() {
       const list = document.getElementById('movements-list');
-      const searchFilter = document.getElementById('search').value.toLowerCase();
-      if (!list) return;
-      list.innerHTML = '';
+      const panelWrap = document.getElementById('movements-panel-table-wrap');
+      const panelSearch = document.getElementById('movements-panel-search') ? document.getElementById('movements-panel-search').value.toLowerCase() : '';
+      const mainSearch = document.getElementById('search') ? document.getElementById('search').value.toLowerCase() : '';
+      const searchFilter = (panelSearch || mainSearch || '').trim();
 
-      movements.forEach(m => {
-        const matches = (m.sap && m.sap.toLowerCase().includes(searchFilter)) ||
-                        (m.description && m.description.toLowerCase().includes(searchFilter)) ||
-                        (m.location && m.location.toLowerCase().includes(searchFilter));
-        if (matches) {
-          let badgeClass = 'badge-entrada';
-          if (m.type === 'SALIDA') badgeClass = 'badge-salida';
-          if (m.type === 'ACTUALIZACIÓN') badgeClass = 'badge-rack';
+      const rowsHtml = movements.filter(m => {
+        if (!searchFilter) return true;
+        return (m.sap && m.sap.toLowerCase().includes(searchFilter)) ||
+               (m.description && m.description.toLowerCase().includes(searchFilter)) ||
+               (m.location && m.location.toLowerCase().includes(searchFilter)) ||
+               (m.pickingOrder && String(m.pickingOrder).toLowerCase().includes(searchFilter)) ||
+               (m.user && m.user.toLowerCase().includes(searchFilter));
+      }).map(m => {
+        let badgeClass = 'badge-entrada';
+        if (m.type === 'SALIDA') badgeClass = 'badge-salida';
+        if (m.type === 'ACTUALIZACIÓN') badgeClass = 'badge-rack';
+        return `
+          <tr>
+            <td data-label="Fecha / Hora">${m.date}</td>
+            <td data-label="Tipo"><span class="badge ${badgeClass}">${m.type}</span></td>
+            <td data-label="N° Picking"><strong>${m.pickingOrder && m.pickingOrder !== '-' ? '#' + m.pickingOrder : '-'}</strong></td>
+            <td data-label="Usuario"><strong>${m.user || 'Admin'}</strong></td>
+            <td data-label="Ubicación"><strong>${m.location}</strong></td>
+            <td data-label="Código SAP">${m.sap}</td>
+            <td data-label="Descripción">${m.description}</td>
+            <td data-label="Movimiento"><strong style="color: #38bdf8;">${m.detail}</strong></td>
+          </tr>
+        `;
+      }).join('');
 
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${m.date}</td>
-            <td><span class="badge ${badgeClass}">${m.type}</span></td>
-            <td><strong>${m.user || 'Admin'}</strong></td>
-            <td><strong>${m.location}</strong></td>
-            <td>${m.sap}</td>
-            <td>${m.description}</td>
-            <td><strong style="color: #38bdf8;">${m.detail}</strong></td>
-          `;
-          list.appendChild(tr);
-        }
-      });
+      if (list) list.innerHTML = rowsHtml;
+      if (panelWrap) {
+        panelWrap.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>FECHA / HORA</th>
+                <th>TIPO</th>
+                <th>N° PICKING</th>
+                <th>USUARIO</th>
+                <th>UBICACIÓN</th>
+                <th>CÓDIGO SAP</th>
+                <th>DESCRIPCIÓN</th>
+                <th>CANTIDAD RETIRADA / INGRESADA</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml || '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No hay movimientos registrados.</td></tr>'}</tbody>
+          </table>
+        `;
+      }
     }
 
     document.getElementById('search').addEventListener('input', () => {
@@ -2085,7 +3989,10 @@
     });
     document.getElementById('filter-location').addEventListener('change', render);
 
+    poblarSelectorLogin();
+    aplicarPresetEnFormulario("picker");
     updateCalcPreview();
+    restaurarSesionGuardada();
   </script>
 </body>
 </html>
