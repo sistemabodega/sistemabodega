@@ -825,11 +825,6 @@
       font-weight: 600;
     }
 
-  
-    /* =========================================================================
-       INTERFAZ RESPONSIVE ESPECIAL PARA CELULAR, PDT, PDA Y TABLET (<= 900px)
-       En PC (> 900px) se mantiene intacto tal cual el diseño original.
-       ========================================================================= */
     @media (max-width: 900px) {
       html, body {
         max-width: 100vw;
@@ -838,7 +833,6 @@
         -webkit-text-size-adjust: 100%;
       }
 
-      /* Login adaptado a pantalla táctil / PDT */
       #auth-overlay {
         padding: 14px;
         align-items: center;
@@ -850,7 +844,7 @@
       }
       .auth-card h2 { font-size: 1.3rem; }
       .auth-card input, .auth-card select {
-        font-size: 16px !important; /* Evita auto-zoom en iOS/Android/PDT */
+        font-size: 16px !important;
         padding: 13px 12px;
       }
       .btn-login, .btn-guest {
@@ -858,7 +852,6 @@
         font-size: 1rem;
       }
 
-      /* Header compacto y limpio en móvil */
       header {
         margin-bottom: 14px;
         display: flex;
@@ -878,7 +871,6 @@
         margin-bottom: 2px;
       }
 
-      /* Barra de navegación fija inferior estilo App móvil / PDT (sin hacer zoom) */
       .nav-buttons-bar {
         position: fixed;
         bottom: 0;
@@ -917,7 +909,6 @@
         transform: none;
       }
 
-      /* Toast centrado arriba en móvil */
       #success-toast {
         top: 12px;
         left: 12px;
@@ -927,7 +918,6 @@
         padding: 12px 14px;
       }
 
-      /* KPIs en cuadrícula compacta de 2 columnas (5ta tarjeta a ancho completo) */
       .stats-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 8px;
@@ -953,7 +943,6 @@
         bottom: 6px;
       }
 
-      /* Paneles a 1 columna con inputs de 16px para que el navegador móvil NUNCA haga zoom */
       .main-grid {
         grid-template-columns: 1fr !important;
         gap: 14px;
@@ -976,7 +965,7 @@
       }
 
       input, select, textarea {
-        font-size: 16px !important; /* Crucial: evita auto-zoom en celulares y PDTs */
+        font-size: 16px !important;
         padding: 12px;
         min-height: 44px;
         width: 100%;
@@ -990,7 +979,6 @@
         justify-content: center;
       }
 
-      /* Mapa visual táctil cómodo para dedos en celular/PDT */
       .map-grid {
         grid-template-columns: repeat(4, 1fr);
         gap: 6px;
@@ -1006,7 +994,6 @@
         font-size: 0.78rem;
       }
 
-      /* Permisos de usuario en 1 columna cómoda */
       .perms-grid {
         grid-template-columns: 1fr;
         gap: 8px;
@@ -1024,7 +1011,6 @@
         text-align: center;
       }
 
-      /* Pestañas y buscadores apilados */
       .tabs-header {
         flex-direction: column;
         gap: 8px;
@@ -1043,7 +1029,6 @@
         width: 100% !important;
       }
 
-      /* Conversión de Tablas a TARJETAS MÓVILES (Cero scroll horizontal y cero zoom) */
       .table-container {
         background: transparent;
         border: none;
@@ -1109,8 +1094,6 @@
       }
     }
 
-  
-    /* Mejoras visuales estilo WMS / SAP */
     .header-subtitle {
       font-size: 0.85rem;
       color: var(--text-muted);
@@ -1186,8 +1169,6 @@
       background: rgba(59, 130, 246, 0.06);
     }
 
-  
-    /* Mejoras visuales y operativas del Módulo de Picking */
     .pick-session-bar {
       display: none;
       background: linear-gradient(135deg, rgba(249, 115, 22, 0.16), rgba(16, 185, 129, 0.12));
@@ -1195,7 +1176,6 @@
       border-radius: 10px;
       padding: 12px 16px;
       margin-bottom: 16px;
-      display: none;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
@@ -1312,7 +1292,6 @@
       color: #fb923c;
       white-space: nowrap;
     }
-
   </style>
 </head>
 <body>
@@ -1342,8 +1321,7 @@
     </div>
   </div>
 
-  <!-- Mensaje Toast Flotante de Éxito -->
-    <!-- MODAL VERIFICACIÓN CONTRASEÑA ADMIN PARA VER PINES -->
+  <!-- MODAL VERIFICACIÓN CONTRASEÑA ADMIN PARA VER PINES -->
   <div id="pin-verify-modal" style="display:none; position:fixed; inset:0; background:rgba(7,11,20,0.85); backdrop-filter:blur(6px); z-index:99999; justify-content:center; align-items:center; padding:16px;">
     <div class="auth-card" style="max-width:380px;">
       <h3 style="margin-bottom:8px; color:#67e8f9;">🔐 Verificar Contraseña de Admin</h3>
@@ -1360,6 +1338,29 @@
     </div>
   </div>
 
+  <!-- MODAL EDITAR NOMBRE DE USUARIO Y/O PIN -->
+  <div id="edit-user-modal" style="display:none; position:fixed; inset:0; background:rgba(7,11,20,0.85); backdrop-filter:blur(6px); z-index:99999; justify-content:center; align-items:center; padding:16px;">
+    <div class="auth-card" style="max-width:400px;">
+      <h3 style="margin-bottom:8px; color:#67e8f9;">✏️ Editar Usuario / PIN</h3>
+      <p style="margin-bottom:14px; font-size:0.85rem; color:var(--text-muted);">Modifica el nombre de usuario y/o su PIN de acceso.</p>
+      <input type="hidden" id="edit-user-original-key" value="">
+      <div class="form-group">
+        <label for="edit-user-new-name">Nombre de Usuario</label>
+        <input type="text" id="edit-user-new-name" placeholder="Nuevo nombre de usuario..." autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label for="edit-user-new-pin">Nuevo PIN de Acceso</label>
+        <input type="text" id="edit-user-new-pin" placeholder="Nuevo PIN..." autocomplete="off" onkeypress="if(event.key==='Enter'){ event.preventDefault(); guardarEdicionUsuarioPin(); }">
+      </div>
+      <div id="edit-user-error" class="auth-error" style="margin-bottom:10px;">Completa un usuario y PIN válidos.</div>
+      <div style="display:flex; gap:10px; margin-top:12px;">
+        <button type="button" class="btn-login" style="margin-top:0;" onclick="guardarEdicionUsuarioPin()">💾 Guardar Cambios</button>
+        <button type="button" class="btn-guest" style="margin-top:0;" onclick="cerrarModalEditarUsuario()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje Toast Flotante de Éxito -->
   <div id="success-toast">🚀 ¡Operación realizada con éxito! Stock actualizado.</div>
 
   <div class="container" id="app-container">
@@ -1473,6 +1474,11 @@
 
         <button type="submit" class="btn-submit" style="margin-top: 14px;">➕ Registrar y Guardar Usuario</button>
       </form>
+
+      <div id="save-all-perms-bar" style="display:none; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; background:rgba(16, 185, 129, 0.14); border:1px solid #10b981; border-radius:10px; padding:12px 16px; margin-bottom:14px;">
+        <span style="color:#6ee7b7; font-weight:600; font-size:0.9rem;">⚠️ Tienes cambios de permisos sin guardar. Presiona el botón para aplicarlos aquí mismo:</span>
+        <button type="button" class="btn-excel-action" style="margin:0; padding:10px 18px;" onclick="guardarTodosLosPermisosPendientes()">💾 Guardar Permisos Ahora</button>
+      </div>
 
       <div class="table-container" style="margin-bottom: 0;">
         <table>
@@ -1685,7 +1691,7 @@
         <div class="map-grid" id="visual-map"></div>
       </div>
 
-      <!-- Panel de Formulario Ingreso con Base Maestra de 142 Productos Oficiales -->
+      <!-- Panel de Formulario Ingreso con Base Maestra de Productos Oficiales -->
       <div class="panel" id="form-panel-wrapper">
         <div class="panel-title" id="form-title">📦 Ingresar Nuevo Producto</div>
         <form id="inventory-form">
@@ -1758,13 +1764,13 @@
     </div>
 
     <!-- Pestañas para alternar entre Inventario Actual y Movimientos -->
-    <div class="tabs-header">
+    <div class="tabs-header" style="display: none;">
       <button class="tab-btn active" id="tab-inventory-btn" onclick="switchTab('inventory')">📦 Inventario Actual por Ubicaciones</button>
       <button class="tab-btn" id="tab-movements-btn" onclick="switchTab('movements')">📋 Historial de Movimientos (Logs de Auditoría)</button>
     </div>
 
     <!-- Buscador -->
-    <div class="table-tools">
+    <div class="table-tools" style="display: none;">
       <input type="text" id="search" placeholder="🔍 Escanee o busque en la tabla...">
       <select id="filter-location" style="width: 240px;">
         <option value="">🌐 Todas las Ubicaciones</option>
@@ -1772,7 +1778,7 @@
     </div>
 
     <!-- Tabla de Inventario -->
-    <div class="table-container" id="table-inventory-container">
+    <div class="table-container" id="table-inventory-container" style="display: none;">
       <table>
         <thead>
           <tr>
@@ -1818,7 +1824,6 @@
       return n.toLocaleString("en-US");
     }
 
-    // Configuración de Credenciales, Roles y Permisos Configurables
     const PERMISOS_PRESETS = {
       admin: {
         roleLabel: "Admin",
@@ -1880,7 +1885,7 @@
     const STORAGE_USERS_KEY = "wms_usuarios_sistema_v1";
 
     const DEFAULT_USERS_CONFIG = {
-      "alexander04": { pin: "041211", displayName: "Admin", ...PERMISOS_PRESETS.admin },
+      "Alexander": { pin: "041211", displayName: "Alexander", isPrimary: true, ...PERMISOS_PRESETS.admin },
       "ChrisA": { pin: "042001", displayName: "ChrisA", ...PERMISOS_PRESETS.picker }
     };
 
@@ -1891,41 +1896,61 @@
     let currentUserKey = "";
     let currentUserPerms = { ...PERMISOS_PRESETS.guest };
 
-    function cargarUsuariosSistema() {
+    function normalizarDiccionarioUsuarios(rawDict) {
       const base = JSON.parse(JSON.stringify(DEFAULT_USERS_CONFIG));
-      try {
-        const raw = localStorage.getItem(STORAGE_USERS_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed && typeof parsed === "object") {
-            Object.keys(parsed).forEach(k => {
-              const u = parsed[k] || {};
-              base[k] = {
-                pin: String(u.pin ?? "").trim(),
-                displayName: u.displayName || k,
-                roleLabel: u.roleLabel || (u.usuarios ? "Admin" : (u.pickear ? "Pickear" : "Visualizar")),
-                role: u.role || (u.usuarios ? "admin" : (u.pickear ? "picker" : "guest")),
-                ingresar: !!u.ingresar,
-                pickear: !!u.pickear,
-                global: u.global !== undefined ? !!u.global : true,
-                movimientos: u.movimientos !== undefined ? !!u.movimientos : (u.role === "admin" || !!u.usuarios),
-                excel: !!u.excel,
-                eliminar: !!u.eliminar,
-                usuarios: !!u.usuarios
-              };
-            });
-          }
+      if (rawDict && typeof rawDict === "object") {
+        if (rawDict["alexander04"] && !rawDict["Alexander"]) {
+          const oldMain = rawDict["alexander04"];
+          rawDict["Alexander"] = {
+            ...oldMain,
+            displayName: "Alexander",
+            isPrimary: true
+          };
+          delete rawDict["alexander04"];
         }
-      } catch (e) {}
-
-      // Asegurar siempre los PINs base de alexander04 y ChrisA si no fueron cambiados
-      if (!base["alexander04"] || !base["alexander04"].pin) {
-        base["alexander04"] = { pin: "041211", displayName: "Admin", ...PERMISOS_PRESETS.admin };
+        const tieneOtroAdminPrincipal = Object.keys(rawDict).some(k => rawDict[k] && rawDict[k].isPrimary && k !== "Alexander");
+        if (tieneOtroAdminPrincipal) {
+          delete base["Alexander"];
+        }
+        Object.keys(rawDict).forEach(k => {
+          if (k === "alexander04") return;
+          const u = rawDict[k] || {};
+          base[k] = {
+            pin: String(u.pin ?? "").trim(),
+            displayName: u.displayName || k,
+            isPrimary: !!u.isPrimary || k === "Alexander",
+            roleLabel: u.roleLabel || (u.usuarios ? "Admin" : (u.pickear ? "Pickear" : "Visualizar")),
+            role: u.role || (u.usuarios ? "admin" : (u.pickear ? "picker" : "guest")),
+            ingresar: !!u.ingresar,
+            pickear: !!u.pickear,
+            global: u.global !== undefined ? !!u.global : true,
+            movimientos: u.movimientos !== undefined ? !!u.movimientos : (u.role === "admin" || !!u.usuarios),
+            excel: !!u.excel,
+            eliminar: !!u.eliminar,
+            usuarios: !!u.usuarios
+          };
+        });
+      }
+      if (!Object.keys(base).some(k => base[k] && base[k].isPrimary)) {
+        const firstAdmin = Object.keys(base).find(k => base[k] && base[k].usuarios);
+        if (firstAdmin) base[firstAdmin].isPrimary = true;
+        else base["Alexander"] = { pin: "041211", displayName: "Alexander", isPrimary: true, ...PERMISOS_PRESETS.admin };
       }
       if (!base["ChrisA"] || !base["ChrisA"].pin) {
         base["ChrisA"] = { pin: "042001", displayName: "ChrisA", ...PERMISOS_PRESETS.picker };
       }
       return base;
+    }
+
+    function cargarUsuariosSistema() {
+      try {
+        const raw = localStorage.getItem(STORAGE_USERS_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          return normalizarDiccionarioUsuarios(parsed);
+        }
+      } catch (e) {}
+      return normalizarDiccionarioUsuarios(null);
     }
 
     let USERS_CONFIG = cargarUsuariosSistema();
@@ -2032,48 +2057,173 @@
       showSuccessToast();
     }
 
+    let pendingUserPermsEdits = {};
+
+    function obtenerEstadoPermisosUsuario(username) {
+      return pendingUserPermsEdits[username]
+        ? { ...USERS_CONFIG[username], ...pendingUserPermsEdits[username] }
+        : { ...USERS_CONFIG[username] };
+    }
+
+    function tieneCambiosPermisosSinGuardar(username) {
+      if (!pendingUserPermsEdits[username] || !USERS_CONFIG[username]) return false;
+      const orig = USERS_CONFIG[username];
+      const draft = pendingUserPermsEdits[username];
+      const keys = ["ingresar", "pickear", "global", "movimientos", "excel", "eliminar", "usuarios"];
+      return keys.some(k => !!orig[k] !== !!draft[k]);
+    }
+
     function alternarPermisoUsuario(username, campo) {
       if (!currentUserPerms.usuarios || !USERS_CONFIG[username]) return;
-      USERS_CONFIG[username][campo] = !USERS_CONFIG[username][campo];
-      const tag = calcularEtiquetaRol(USERS_CONFIG[username]);
-      USERS_CONFIG[username].roleLabel = tag.roleLabel;
-      USERS_CONFIG[username].role = tag.role;
-
-      if (currentUserKey === username) {
-        currentUserPerms = { ...USERS_CONFIG[username] };
-        userRole = currentUserPerms.role;
-        aplicarVisibilidadPorPermisos();
-      }
-      guardarUsuariosSistema();
+      const draft = obtenerEstadoPermisosUsuario(username);
+      draft[campo] = !draft[campo];
+      const tag = calcularEtiquetaRol(draft);
+      draft.roleLabel = tag.roleLabel;
+      draft.role = tag.role;
+      pendingUserPermsEdits[username] = draft;
+      renderUsersTable();
     }
 
     function aplicarRolRapidoAUsuario(username, presetKey) {
       if (!currentUserPerms.usuarios || !USERS_CONFIG[username]) return;
       const preset = PERMISOS_PRESETS[presetKey];
       if (!preset) return;
-      const pinActual = USERS_CONFIG[username].pin;
-      const displayActual = USERS_CONFIG[username].displayName || username;
-      USERS_CONFIG[username] = {
-        pin: pinActual,
-        displayName: displayActual,
+      const actual = obtenerEstadoPermisosUsuario(username);
+      pendingUserPermsEdits[username] = {
+        ...actual,
         ...preset
       };
+      renderUsersTable();
+    }
+
+    function guardarPermisosUsuario(username) {
+      if (!currentUserPerms.usuarios || !USERS_CONFIG[username]) return;
+      const draft = pendingUserPermsEdits[username];
+      if (draft) {
+        USERS_CONFIG[username] = {
+          ...USERS_CONFIG[username],
+          ...draft
+        };
+        delete pendingUserPermsEdits[username];
+      }
       if (currentUserKey === username) {
         currentUserPerms = { ...USERS_CONFIG[username] };
         userRole = currentUserPerms.role;
         aplicarVisibilidadPorPermisos();
       }
       guardarUsuariosSistema();
+      const toast = document.getElementById('success-toast');
+      if (toast) toast.textContent = `✅ Permisos de ${username} guardados correctamente.`;
+      showSuccessToast();
+      setTimeout(() => {
+        if (toast) toast.textContent = "🚀 ¡Operación realizada con éxito! Stock actualizado.";
+      }, 3100);
+    }
+
+    function guardarTodosLosPermisosPendientes() {
+      if (!currentUserPerms.usuarios) return;
+      const pendientes = Object.keys(pendingUserPermsEdits);
+      if (pendientes.length === 0) return;
+      pendientes.forEach(username => {
+        if (USERS_CONFIG[username]) {
+          USERS_CONFIG[username] = {
+            ...USERS_CONFIG[username],
+            ...pendingUserPermsEdits[username]
+          };
+          if (currentUserKey === username) {
+            currentUserPerms = { ...USERS_CONFIG[username] };
+            userRole = currentUserPerms.role;
+            aplicarVisibilidadPorPermisos();
+          }
+        }
+      });
+      pendingUserPermsEdits = {};
+      guardarUsuariosSistema();
+      const toast = document.getElementById('success-toast');
+      if (toast) toast.textContent = "✅ Todos los permisos modificados han sido guardados.";
+      showSuccessToast();
+      setTimeout(() => {
+        if (toast) toast.textContent = "🚀 ¡Operación realizada con éxito! Stock actualizado.";
+      }, 3100);
+    }
+
+    function abrirModalEditarUsuario(username) {
+      if (!currentUserPerms.usuarios || !USERS_CONFIG[username]) return;
+      const u = USERS_CONFIG[username];
+      document.getElementById("edit-user-original-key").value = username;
+      const nameInput = document.getElementById("edit-user-new-name");
+      nameInput.value = username;
+      nameInput.disabled = false;
+      nameInput.title = "";
+      document.getElementById("edit-user-new-pin").value = u.pin || "";
+      document.getElementById("edit-user-error").style.display = "none";
+      document.getElementById("edit-user-modal").style.display = "flex";
+      setTimeout(() => {
+        nameInput.focus();
+        nameInput.select();
+      }, 50);
+    }
+
+    function cerrarModalEditarUsuario() {
+      document.getElementById("edit-user-modal").style.display = "none";
+      document.getElementById("edit-user-error").style.display = "none";
+    }
+
+    function guardarEdicionUsuarioPin() {
+      if (!currentUserPerms.usuarios) return;
+      const origKey = document.getElementById("edit-user-original-key").value;
+      const newKey = document.getElementById("edit-user-new-name").value.trim();
+      const newPin = String(document.getElementById("edit-user-new-pin").value || "").trim();
+      const errEl = document.getElementById("edit-user-error");
+
+      if (!origKey || !USERS_CONFIG[origKey] || !newKey || !newPin) {
+        errEl.textContent = "El usuario y el PIN no pueden estar vacíos.";
+        errEl.style.display = "block";
+        return;
+      }
+
+      if (newKey !== origKey && USERS_CONFIG[newKey]) {
+        errEl.textContent = `Ya existe otro usuario llamado "${newKey}". Elige otro nombre.`;
+        errEl.style.display = "block";
+        return;
+      }
+
+      const prevData = { ...USERS_CONFIG[origKey] };
+      prevData.pin = newPin;
+      prevData.displayName = newKey;
+
+      if (newKey !== origKey) {
+        delete USERS_CONFIG[origKey];
+        if (pendingUserPermsEdits[origKey]) {
+          pendingUserPermsEdits[newKey] = pendingUserPermsEdits[origKey];
+          delete pendingUserPermsEdits[origKey];
+        }
+      }
+      USERS_CONFIG[newKey] = prevData;
+
+      if (currentUserKey === origKey) {
+        currentUserKey = newKey;
+        currentUserName = newKey;
+        currentUserPerms = { ...prevData };
+        guardarSesionActiva();
+        aplicarVisibilidadPorPermisos();
+      }
+
+      guardarUsuariosSistema();
+      cerrarModalEditarUsuario();
+      showSuccessToast();
     }
 
     function eliminarUsuario(username) {
       if (!currentUserPerms.usuarios) return;
-      if (username === "alexander04") {
-        alert("No puedes eliminar el usuario principal alexander04.");
+      const u = USERS_CONFIG[username];
+      if (u && u.isPrimary) {
+        alert(`No puedes eliminar el usuario principal (${username}). Puedes editar su nombre o PIN con el botón ✏️ Editar.`);
         return;
       }
       if (!confirm(`¿Eliminar al usuario "${username}"?`)) return;
       delete USERS_CONFIG[username];
+      delete pendingUserPermsEdits[username];
       guardarUsuariosSistema();
     }
 
@@ -2110,9 +2260,10 @@
       const err = document.getElementById("admin-verify-pin-error");
       const entered = String(inp ? inp.value : "").trim();
 
+      const primaryKey = Object.keys(USERS_CONFIG).find(k => USERS_CONFIG[k] && USERS_CONFIG[k].isPrimary) || "Alexander";
       const adminRecord = (currentUserKey && USERS_CONFIG[currentUserKey])
         ? USERS_CONFIG[currentUserKey]
-        : USERS_CONFIG["alexander04"];
+        : USERS_CONFIG[primaryKey];
       const expectedPin = String((adminRecord && adminRecord.pin) || "").trim();
 
       if (entered && expectedPin && entered === expectedPin) {
@@ -2152,8 +2303,15 @@
         ["usuarios", "Usuarios"]
       ];
 
+      const hayPendientesGlobal = Object.keys(USERS_CONFIG).some(k => tieneCambiosPermisosSinGuardar(k));
+      const barraGuardarGlobal = document.getElementById("save-all-perms-bar");
+      if (barraGuardarGlobal) {
+        barraGuardarGlobal.style.display = hayPendientesGlobal ? "flex" : "none";
+      }
+
       tbody.innerHTML = Object.keys(USERS_CONFIG).map(userKey => {
-        const u = USERS_CONFIG[userKey];
+        const u = obtenerEstadoPermisosUsuario(userKey);
+        const sinGuardar = tieneCambiosPermisosSinGuardar(userKey);
         const pills = itemsPermisos
           .filter(([k]) => !!u[k])
           .map(([, label]) => `<span class="perm-pill">${label}</span>`)
@@ -2167,8 +2325,11 @@
           `).join("");
 
         return `
-          <tr>
-            <td data-label="Usuario"><strong>${userKey}</strong></td>
+          <tr ${sinGuardar ? 'style="background: rgba(16, 185, 129, 0.08);"' : ''}>
+            <td data-label="Usuario">
+              <strong>${userKey}</strong>
+              ${u.isPrimary ? '<div style="font-size:0.72rem;color:#38bdf8;margin-top:2px;">⭐ Usuario Principal</div>' : ''}
+            </td>
             <td data-label="PIN">
               <span style="font-family:monospace; letter-spacing:2px; margin-right:6px;">${pinesVisiblesPorAdmin ? u.pin : "***"}</span>
               <button type="button" class="btn-preset" style="padding:3px 7px; font-size:0.72rem;" onclick="alternarVisibilidadPinesAdmin()">${pinesVisiblesPorAdmin ? "🙈 Ocultar" : "👁️ Ver"}</button>
@@ -2177,27 +2338,32 @@
             <td data-label="Permisos Activos"><div class="perm-pills">${pills || '<span class="perm-pill">Solo Visualizar</span>'}</div></td>
             <td data-label="Modificar Permisos" style="flex-direction:column;align-items:flex-end;">
               <div style="margin-bottom:6px;text-align:right;">${checks}</div>
-              <div class="preset-btns">
+              <div class="preset-btns" style="align-items:center;">
                 <button type="button" class="btn-preset" onclick="aplicarRolRapidoAUsuario('${userKey}', 'admin')">Admin</button>
                 <button type="button" class="btn-preset" onclick="aplicarRolRapidoAUsuario('${userKey}', 'solo_ingresar')">Solo Ingresar</button>
                 <button type="button" class="btn-preset" onclick="aplicarRolRapidoAUsuario('${userKey}', 'picker')">Pickear</button>
                 <button type="button" class="btn-preset" onclick="aplicarRolRapidoAUsuario('${userKey}', 'solo_movimientos')">Solo Movimientos</button>
                 <button type="button" class="btn-preset" onclick="aplicarRolRapidoAUsuario('${userKey}', 'guest')">Visualizar</button>
+                <button type="button"
+                  onclick="guardarPermisosUsuario('${userKey}')"
+                  style="background:${sinGuardar ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'rgba(16, 185, 129, 0.22)'}; color:${sinGuardar ? '#fff' : '#6ee7b7'}; border:1px solid #10b981; padding:6px 12px; border-radius:6px; font-size:0.78rem; font-weight:700; cursor:pointer; box-shadow:${sinGuardar ? '0 0 12px rgba(16,185,129,0.45)' : 'none'};">
+                  💾 Guardar Permisos${sinGuardar ? ' *' : ''}
+                </button>
               </div>
             </td>
             <td data-label="Acciones">
-              ${userKey !== "alexander04"
-                ? `<button type="button" class="btn-delete" onclick="eliminarUsuario('${userKey}')">🗑️</button>`
-                : `<span style="color:var(--text-muted);font-size:0.8rem;">Principal</span>`}
+              <div class="actions">
+                <button type="button" class="btn-edit" onclick="abrirModalEditarUsuario('${userKey}')">✏️ Editar</button>
+                ${!u.isPrimary
+                  ? `<button type="button" class="btn-delete" onclick="eliminarUsuario('${userKey}')">🗑️</button>`
+                  : `<span style="color:var(--text-muted);font-size:0.78rem;align-self:center;">Principal</span>`}
+              </div>
             </td>
           </tr>
         `;
       }).join("");
     }
 
-    // =========================================================================
-    // BASE DE DATOS MAESTRA OFICIAL (Los 142 productos extraídos de EXPORTAR.xlsx)
-    // =========================================================================
     const BASE_DATOS_MAESTRA = [
       { sap: "01-00004", barcode: "7312040017034", description: "ABSOLUT BLUE VODKA 12X1000ML NR NK 40%", unitsPerBox: 12 },
       { sap: "01-00006", barcode: "7312040017171", description: "ABSOLUT BLUE VODKA 6X1750ML R 40%", unitsPerBox: 6 },
@@ -2362,7 +2528,6 @@
       }
     }
 
-    // Persistencia de sesión al recargar la página (hasta presionar Cerrar Sesión)
     const STORAGE_SESSION_KEY = "wms_sesion_activa_v1";
 
     function guardarSesionActiva() {
@@ -2396,6 +2561,7 @@
           return true;
         }
 
+        if (sess.userKey === "alexander04") sess.userKey = "Alexander";
         if (sess.userKey && USERS_CONFIG[sess.userKey]) {
           const u = USERS_CONFIG[sess.userKey];
           currentUserKey = sess.userKey;
@@ -2464,7 +2630,7 @@
       if (btnCloseMov) btnCloseMov.style.display = soloMov ? 'none' : 'inline-block';
     }
 
-    function iniciarSesionExitosa() {
+    function iniciarSesionExitosa(skipDefaultHome = false) {
       document.getElementById('auth-overlay').style.display = 'none';
       document.getElementById('app-container').style.display = 'block';
       aplicarVisibilidadPorPermisos();
@@ -2472,31 +2638,28 @@
         goToPick();
       } else if (isSoloMovementsUser()) {
         goToMovementsTab();
-      } else {
+      } else if (!skipDefaultHome) {
+        goToHome();
+        render();
+      } else if (typeof render === 'function') {
         render();
       }
     }
 
-    // Configuración de Firebase
     const firebaseConfig = {
       databaseURL: "https://bodega-19272-default-rtdb.firebaseio.com"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // =========================================================================
-    // GENERACIÓN EXACTA DE UBICACIONES CON EL ORDEN SOLICITADO
-    // =========================================================================
     const locationsList = [];
 
-    // 1. RACK 1: 8 Líneas (A-H) x 6 Niveles = 48 Ubicaciones
     ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].forEach(line => {
       [1, 2, 3, 4, 5, 6].forEach(lvl => {
         locationsList.push(`RACK-1-${line}${lvl}`);
       });
     });
 
-    // 2. RACK 2: 14 iniciales, luego Nivel 3 con Profundidad, luego Nivel 4 con Profundidad
     const linesR2 = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
     linesR2.forEach(line => {
       locationsList.push(`RACK-2-${line}1`);
@@ -2515,21 +2678,18 @@
       }
     });
 
-    // 3. RACK 3: 7 Líneas (A-G) x 10 espacios (1 al 10) = 70 Ubicaciones
     linesR2.forEach(line => {
       for (let lvl = 1; lvl <= 10; lvl++) {
         locationsList.push(`RACK-3-${line}${lvl}`);
       }
     });
 
-    // 4. RACK 4: 7 Líneas (A-G) x 10 espacios (1 al 10) = 70 Ubicaciones
     linesR2.forEach(line => {
       for (let lvl = 1; lvl <= 10; lvl++) {
         locationsList.push(`RACK-4-${line}${lvl}`);
       }
     });
 
-    // 5. RACK 5: 14 iniciales, luego Nivel 3 con 6 de profundidad, luego Nivel 4 con 6 de profundidad
     const linesR5 = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
     linesR5.forEach(line => {
       locationsList.push(`RACK-5-${line}1`);
@@ -2548,14 +2708,12 @@
       }
     });
 
-    // 6. RACK 6: 10 Líneas (A-J) x 6 Niveles = 60 Ubicaciones
     ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'].forEach(line => {
       [1, 2, 3, 4, 5, 6].forEach(lvl => {
         locationsList.push(`RACK-6-${line}${lvl}`);
       });
     });
 
-    // 7. JAULAS ESPECIALES
     locationsList.push('JAULA-ALTA-GAMA', 'JAULA-MERMA');
 
     function isCageLocation(loc) {
@@ -2600,44 +2758,34 @@
     let movements = [];
     let currentTab = 'inventory';
 
-    // Sincronización en tiempo real de usuarios entre Laptop, Celular y PDT
     db.ref('usuarios_sistema').on('value', (snapshot) => {
       const remoteUsers = snapshot.val();
       if (remoteUsers && typeof remoteUsers === 'object') {
-        const merged = JSON.parse(JSON.stringify(DEFAULT_USERS_CONFIG));
-        Object.keys(remoteUsers).forEach(k => {
-          const u = remoteUsers[k] || {};
-          merged[k] = {
-            pin: String(u.pin ?? '').trim(),
-            displayName: u.displayName || k,
-            roleLabel: u.roleLabel || (u.usuarios ? 'Admin' : (u.pickear ? 'Pickear' : 'Visualizar')),
-            role: u.role || (u.usuarios ? 'admin' : (u.pickear ? 'picker' : 'guest')),
-            ingresar: !!u.ingresar,
-            pickear: !!u.pickear,
-            global: u.global !== undefined ? !!u.global : true,
-            movimientos: u.movimientos !== undefined ? !!u.movimientos : (u.role === 'admin' || !!u.usuarios),
-            excel: !!u.excel,
-            eliminar: !!u.eliminar,
-            usuarios: !!u.usuarios
-          };
-        });
-        USERS_CONFIG = merged;
+        const hadLegacyKey = !!remoteUsers['alexander04'];
+        USERS_CONFIG = normalizarDiccionarioUsuarios({ ...remoteUsers });
+        if (hadLegacyKey) {
+          db.ref('usuarios_sistema').set(USERS_CONFIG);
+        }
         try {
           localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(USERS_CONFIG));
         } catch (e) {}
         poblarSelectorLogin();
         renderUsersTable();
 
-        // Si el usuario actual tiene sesión abierta y se actualizaron sus permisos desde otro equipo
         if (currentUserKey && USERS_CONFIG[currentUserKey]) {
           currentUserPerms = { ...USERS_CONFIG[currentUserKey] };
           userRole = currentUserPerms.role;
           aplicarVisibilidadPorPermisos();
+          const savedTab = leerPestanaGuardada();
+          if (savedTab && document.getElementById('app-container').style.display !== 'none') {
+            _isRestoringTabOnLoad = true;
+            navegarAPestanaPersistida(savedTab);
+            setTimeout(() => { _isRestoringTabOnLoad = false; }, 120);
+          }
         } else if (document.getElementById('auth-overlay').style.display !== 'none') {
           restaurarSesionGuardada();
         }
       } else {
-        // Si aún no existe el nodo en Firebase, subir la configuración local inicial
         db.ref('usuarios_sistema').set(USERS_CONFIG);
       }
     });
@@ -2663,7 +2811,6 @@
       return `${dia}/${mes}/${anio} a las ${String(horas).padStart(2, '0')}:${mins}:${segs} ${ampm}`;
     }
 
-    // Sincronización en tiempo real de órdenes de picking entre Laptop, Celular y PDT
     db.ref('picking_orders').on('value', (snapshot) => {
       pickingOrders = snapshot.val() || {};
       verificarEstadoOrdenPicking();
@@ -2695,7 +2842,6 @@
 
       const record = pickingOrders[orderNum];
 
-      // Caso 1: La orden ya fue pickeada y cerrada
       if (record && record.status === 'completed') {
         const quien = record.completedBy || record.user || 'Otro usuario';
         const cuando = record.completedAtText || 'fecha no registrada';
@@ -2711,7 +2857,6 @@
         return;
       }
 
-      // Caso 2: La orden está siendo pickeada actualmente
       if (record && record.status === 'in_progress') {
         const esMia = (record.userKey && currentUserKey && record.userKey === currentUserKey) ||
                       (record.user && record.user === currentUserName);
@@ -2741,7 +2886,6 @@
         return;
       }
 
-      // Caso 3: Orden libre / nueva lista para tomar
       banner.className = 'pick-order-alert';
       banner.textContent = '';
       pickForm.classList.add('pick-fields-locked');
@@ -2851,7 +2995,6 @@
       verificarEstadoOrdenPicking();
     }
 
-    // Sincronización en tiempo real de inventario
     db.ref('inventario').on('value', (snapshot) => {
       const data = snapshot.val();
       inventory = data ? Object.values(data) : [];
@@ -2861,7 +3004,6 @@
       renderGlobalInventory();
     });
 
-    // Sincronización en tiempo real de movimientos desde Firebase
     db.ref('movimientos').on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -2898,9 +3040,6 @@
       db.ref('movimientos/' + uniqueId).set(movData);
     }
 
-    // =========================================================================
-    // FUNCIONES DE AUTOCOMPLETADO INTELIGENTE (Base Maestra + Inventario Actual)
-    // =========================================================================
     function getCombinedMasterList() {
       const map = new Map();
       BASE_DATOS_MAESTRA.forEach(item => map.set(item.sap, item));
@@ -2954,8 +3093,6 @@
           document.getElementById('unitsPerBox').value = found.unitsPerBox;
         }
         updateCalcPreview();
-    document.getElementById('pick-boxes')?.addEventListener('input', updatePickRemainingPreview);
-    document.getElementById('pick-units')?.addEventListener('input', updatePickRemainingPreview);
       }
     }
 
@@ -2987,7 +3124,72 @@
       }
     }
 
+    function limpiarCamposPestanaActual() {
+      const formEl = document.getElementById('inventory-form');
+      if (formEl) {
+        formEl.reset();
+        const editingIdEl = document.getElementById('editing-id');
+        if (editingIdEl) editingIdEl.value = '';
+        const formTitleEl = document.getElementById('form-title');
+        if (formTitleEl) formTitleEl.textContent = '📦 Ingresar Nuevo Producto';
+        const btnSaveEl = document.getElementById('btn-save');
+        if (btnSaveEl) btnSaveEl.textContent = 'Guardar Producto en Ubicación';
+        const btnCancelEl = document.getElementById('btn-cancel');
+        if (btnCancelEl) btnCancelEl.style.display = 'none';
+        const boxesEl = document.getElementById('boxes');
+        const unitsEl = document.getElementById('units');
+        if (boxesEl) boxesEl.value = '';
+        if (unitsEl) unitsEl.value = '';
+        if (typeof updateCalcPreview === 'function') updateCalcPreview();
+      }
+
+      const pickSearchEl = document.getElementById('pick-search-input');
+      if (pickSearchEl) pickSearchEl.value = '';
+      const pickSelIdEl = document.getElementById('pick-selected-id');
+      if (pickSelIdEl) pickSelIdEl.value = '';
+      const pickLocEl = document.getElementById('pick-location');
+      if (pickLocEl) pickLocEl.value = '';
+      const pickStockEl = document.getElementById('pick-stock-info');
+      if (pickStockEl) pickStockEl.value = '';
+      const pickBoxesEl = document.getElementById('pick-boxes');
+      if (pickBoxesEl) pickBoxesEl.value = '';
+      const pickUnitsEl = document.getElementById('pick-units');
+      if (pickUnitsEl) pickUnitsEl.value = '';
+      const pickHintEl = document.getElementById('pick-multi-loc-hint');
+      if (pickHintEl) {
+        pickHintEl.style.display = 'none';
+        pickHintEl.innerHTML = '';
+      }
+      if (!activePickingOrderNumber) {
+        const pickOrderInput = document.getElementById('pick-order-number');
+        if (pickOrderInput && !pickOrderInput.readOnly) {
+          pickOrderInput.value = '';
+        }
+      }
+      if (typeof updatePickRemainingPreview === 'function') updatePickRemainingPreview();
+
+      const globalSearchEl = document.getElementById('global-search');
+      if (globalSearchEl) globalSearchEl.value = '';
+      const movPanelSearchEl = document.getElementById('movements-panel-search');
+      if (movPanelSearchEl) movPanelSearchEl.value = '';
+      const mainSearchEl = document.getElementById('search');
+      if (mainSearchEl) mainSearchEl.value = '';
+      const filterLocEl = document.getElementById('filter-location');
+      if (filterLocEl) filterLocEl.value = '';
+      const mapRackFilterEl = document.getElementById('map-rack-filter');
+      if (mapRackFilterEl) mapRackFilterEl.value = '';
+
+      const newUserFormEl = document.getElementById('new-user-form');
+      if (newUserFormEl) {
+        newUserFormEl.reset();
+        const roleTagEl = document.getElementById('new-userrole-tag');
+        if (roleTagEl) roleTagEl.value = 'picker';
+        if (typeof aplicarPresetEnFormulario === 'function') aplicarPresetEnFormulario('picker');
+      }
+    }
+
     function switchTab(tab) {
+      limpiarCamposPestanaActual();
       currentTab = tab;
       const btnInv = document.getElementById('tab-inventory-btn');
       const btnMov = document.getElementById('tab-movements-btn');
@@ -3009,7 +3211,6 @@
       }
     }
 
-    // NAVEGACIÓN SUPERIOR
     function isSoloPickerUser() {
       const p = currentUserPerms || {};
       return !!(p.pickear && !p.ingresar && !p.usuarios && !p.excel && !p.eliminar && userRole !== 'admin');
@@ -3046,6 +3247,7 @@
     }
 
     function goToHome() {
+      limpiarCamposPestanaActual();
       if (isSoloPickerUser()) {
         goToPick();
         return;
@@ -3064,13 +3266,14 @@
     }
 
     function goToPick() {
+      limpiarCamposPestanaActual();
       if (!currentUserPerms.pickear) {
         alert('No tienes permiso para realizar salidas o picking.');
         return;
       }
       hideAllMainPanels();
       document.getElementById('pick-panel').style.display = 'block';
-      setSecondarySectionsInUsersMode(false, isSoloPickerUser());
+      setSecondarySectionsInUsersMode(true, true);
 
       resetNavClasses();
       document.getElementById('btn-nav-pick').className = 'btn-nav active-pick';
@@ -3081,6 +3284,7 @@
     }
 
     function goToGlobalInventory() {
+      limpiarCamposPestanaActual();
       if (isSoloPickerUser()) {
         goToPick();
         return;
@@ -3101,6 +3305,7 @@
     }
 
     function goToMovementsTab() {
+      limpiarCamposPestanaActual();
       if (isSoloPickerUser()) {
         goToPick();
         return;
@@ -3162,15 +3367,14 @@
     }
 
     function goToUsers() {
+      limpiarCamposPestanaActual();
       if (!currentUserPerms.usuarios) {
         alert('Solo usuarios con permiso de administración de usuarios pueden entrar aquí.');
         return;
       }
+      hideAllMainPanels();
       document.getElementById('users-panel').style.display = 'block';
-      document.getElementById('pick-panel').style.display = 'none';
-      document.getElementById('global-panel').style.display = 'none';
-      document.getElementById('main-content-grid').style.display = 'none';
-      setSecondarySectionsInUsersMode(true);
+      setSecondarySectionsInUsersMode(true, false);
 
       resetNavClasses();
       document.getElementById('btn-nav-users').className = 'btn-nav active-users';
@@ -3357,7 +3561,6 @@
       }, 3000);
     }
 
-    // FORMULARIO DE INGRESO
     const form = document.getElementById('inventory-form');
     if (form) {
       form.addEventListener('submit', (e) => {
@@ -3442,7 +3645,6 @@
       document.getElementById('pick-location').value = item.location;
       document.getElementById('pick-stock-info').value = `${item.boxes} Cajas / ${item.units} Sueltas (Total: ${formatNum(item.totalUnits)} unids)`;
 
-      // Mostrar si el mismo SKU/descripción existe en otras ubicaciones
       const sameSkuItems = inventory.filter(i =>
         i.id !== item.id &&
         ((item.sap && i.sap && i.sap.toLowerCase() === item.sap.toLowerCase()) ||
@@ -3473,10 +3675,8 @@
         return;
       }
 
-      // 1) Coincidencia exacta con formato del datalist
       let item = inventory.find(i => `[${i.location}] ${i.description} (SAP: ${i.sap})` === val);
 
-      // 2) Coincidencia exacta por código de barras o SAP
       if (!item) {
         const low = val.toLowerCase();
         item = inventory.find(i =>
@@ -3490,7 +3690,6 @@
         return;
       }
 
-      // 3) Búsqueda multi-palabra para mostrar sugerencias rápidas de ubicaciones si hay varias
       const terms = val.toLowerCase().split(/\s+/).filter(Boolean);
       const matches = inventory.filter(i => {
         const hay = `${i.location || ''} ${i.sap || ''} ${i.barcode || ''} ${i.description || ''}`.toLowerCase();
@@ -3547,6 +3746,9 @@
         remEl.textContent = `${formatNum(remTot)} unids. restantes`;
       }
     }
+
+    document.getElementById('pick-boxes')?.addEventListener('input', updatePickRemainingPreview);
+    document.getElementById('pick-units')?.addEventListener('input', updatePickRemainingPreview);
 
     function renderPickingSessionSummary() {
       const bar = document.getElementById('pick-session-bar');
@@ -3664,7 +3866,6 @@
 
       addMovementLog('SALIDA', item.location, item.sap, item.description, boxesToSub, unitsToSub, orderNum);
 
-      // Incrementar contador de líneas pickeadas en la orden
       const updatedOrder = {
         ...orderRec,
         itemsPicked: (orderRec.itemsPicked || 0) + 1,
@@ -3988,6 +4189,145 @@
       else renderMovements();
     });
     document.getElementById('filter-location').addEventListener('change', render);
+
+    document.addEventListener('visibilitychange', () => {
+      limpiarCamposPestanaActual();
+    });
+    window.addEventListener('blur', () => {
+      limpiarCamposPestanaActual();
+    });
+
+    // =========================================================================
+    // PERSISTENCIA DE PESTAÑA ACTIVA AL ACTUALIZAR / RECARGAR LA PÁGINA
+    // =========================================================================
+    const STORAGE_ACTIVE_NAV_KEY = "wms_active_nav_tab_v1";
+    const VALID_NAV_TABS = ["home", "pick", "global", "movements", "users"];
+
+    function guardarPestanaActiva(tabName) {
+      if (!VALID_NAV_TABS.includes(tabName)) return;
+      try {
+        localStorage.setItem(STORAGE_ACTIVE_NAV_KEY, tabName);
+      } catch (e) {}
+      const targetHash = "#nav=" + tabName;
+      if (window.location.hash !== targetHash) {
+        try {
+          history.replaceState(null, "", targetHash);
+        } catch (e) {
+          window.location.hash = targetHash;
+        }
+      }
+    }
+
+    function leerPestanaGuardada() {
+      const rawHash = (window.location.hash || "").replace(/^#/, "").trim();
+      const match = rawHash.match(/^(?:nav|tab)=([a-z0-9_-]+)$/i) || rawHash.match(/^([a-z0-9_-]+)$/i);
+      const fromHash = match ? match[1].toLowerCase() : "";
+      if (VALID_NAV_TABS.includes(fromHash)) return fromHash;
+
+      try {
+        const fromStorage = (localStorage.getItem(STORAGE_ACTIVE_NAV_KEY) || "").trim().toLowerCase();
+        if (VALID_NAV_TABS.includes(fromStorage)) return fromStorage;
+      } catch (e) {}
+      return null;
+    }
+
+    function navegarAPestanaPersistida(tabName) {
+      if (!tabName) return false;
+      if (tabName === "pick" && currentUserPerms && currentUserPerms.pickear) {
+        goToPick();
+        return true;
+      }
+      if (tabName === "global" && currentUserPerms && currentUserPerms.global && !isSoloPickerUser() && !isSoloMovementsUser() && !isSoloViewerUser()) {
+        goToGlobalInventory();
+        return true;
+      }
+      if (tabName === "movements" && currentUserPerms && (currentUserPerms.movimientos || userRole === "admin") && !isSoloPickerUser()) {
+        goToMovementsTab();
+        return true;
+      }
+      if (tabName === "users" && currentUserPerms && currentUserPerms.usuarios && !isSoloPickerUser() && !isSoloMovementsUser()) {
+        goToUsers();
+        return true;
+      }
+      if (tabName === "home" && !isSoloPickerUser() && !isSoloMovementsUser()) {
+        goToHome();
+        return true;
+      }
+      return false;
+    }
+
+    const _origGoToHome = goToHome;
+    goToHome = function() {
+      _origGoToHome();
+      if (!isSoloPickerUser() && !isSoloMovementsUser()) {
+        guardarPestanaActiva("home");
+      }
+    };
+
+    const _origGoToPick = goToPick;
+    goToPick = function() {
+      _origGoToPick();
+      if (currentUserPerms && currentUserPerms.pickear) {
+        guardarPestanaActiva("pick");
+      }
+    };
+
+    const _origGoToGlobalInventory = goToGlobalInventory;
+    goToGlobalInventory = function() {
+      _origGoToGlobalInventory();
+      if (currentUserPerms && currentUserPerms.global && !isSoloPickerUser() && !isSoloMovementsUser() && !isSoloViewerUser()) {
+        guardarPestanaActiva("global");
+      }
+    };
+
+    const _origGoToMovementsTab = goToMovementsTab;
+    goToMovementsTab = function() {
+      _origGoToMovementsTab();
+      if (currentUserPerms && (currentUserPerms.movimientos || userRole === "admin") && !isSoloPickerUser()) {
+        guardarPestanaActiva("movements");
+      }
+    };
+
+    const _origGoToUsers = goToUsers;
+    goToUsers = function() {
+      _origGoToUsers();
+      if (currentUserPerms && currentUserPerms.usuarios && !isSoloPickerUser() && !isSoloMovementsUser()) {
+        guardarPestanaActiva("users");
+      }
+    };
+
+    let _isRestoringTabOnLoad = false;
+
+    const _origIniciarSesionExitosa = iniciarSesionExitosa;
+    iniciarSesionExitosa = function(skipDefaultHome = false) {
+      const savedTab = leerPestanaGuardada();
+      const shouldSkipDefault = !!(skipDefaultHome || savedTab);
+      _origIniciarSesionExitosa(shouldSkipDefault);
+      if (savedTab) {
+        _isRestoringTabOnLoad = true;
+        navegarAPestanaPersistida(savedTab);
+        setTimeout(() => { _isRestoringTabOnLoad = false; }, 120);
+      }
+    };
+
+    const _origGoToHomeAfterPersist = goToHome;
+    goToHome = function() {
+      if (_isRestoringTabOnLoad) {
+        const savedTab = leerPestanaGuardada();
+        if (savedTab && savedTab !== "home") {
+          navegarAPestanaPersistida(savedTab);
+          return;
+        }
+      }
+      _origGoToHomeAfterPersist();
+    };
+
+    window.addEventListener("hashchange", () => {
+      if (document.getElementById("app-container").style.display !== "none") {
+        const fromHash = leerPestanaGuardada();
+        if (fromHash) navegarAPestanaPersistida(fromHash);
+      }
+    });
 
     poblarSelectorLogin();
     aplicarPresetEnFormulario("picker");
