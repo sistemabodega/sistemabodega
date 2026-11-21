@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sistema de Gestión de Bodega & Mapas - Pro</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Almoryx — Sistema y Control de Bodega</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
   <!-- Firebase App y Realtime Database SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <!-- Librería SheetJS (XLSX) para importar/exportar Excel -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- ZXing para lectura de códigos de barras por cámara -->
+  <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
   <style>
     :root {
       --bg: #0b0f19;
@@ -172,13 +174,31 @@
     #user-session-badge strong { color: #38bdf8; }
 
     header h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #f8fafc;
       margin-bottom: 6px;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.45);
+    }
+    header h1 .title-box-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      font-size: 1.15rem;
+      line-height: 1;
+      border-radius: 9px;
+      background: rgba(59, 130, 246, 0.16);
+      border: 1px solid rgba(96, 165, 250, 0.35);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.35);
+      flex-shrink: 0;
     }
 
     /* Barra de Botones Superiores */
@@ -242,7 +262,7 @@
       color: white;
     }
 
-    /* Notificación flotante de Éxito */
+    /* Notificación flotante de Éxito / Escaneo */
     #success-toast {
       position: fixed;
       top: 24px;
@@ -254,13 +274,157 @@
       font-weight: 700;
       box-shadow: 0 6px 25px rgba(16, 185, 129, 0.4);
       display: none;
-      z-index: 9999;
+      z-index: 99999;
       animation: slideIn 0.3s ease-out;
     }
 
     @keyframes slideIn {
       from { transform: translateX(100%); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Barra de Escáner Rápido Optimizado */
+    .scan-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 0.82rem;
+    }
+
+    .scan-toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .scan-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .scan-status-pill.flash {
+      background: rgba(56, 189, 248, 0.28);
+      color: #e0f2fe;
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+    }
+
+    .scan-toggle-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #cbd5e1;
+      font-size: 0.78rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .scan-toggle-label input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      accent-color: #38bdf8;
+      cursor: pointer;
+      min-height: auto;
+    }
+
+    .btn-cam-scan {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: #fff;
+      border: none;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 3px 12px rgba(14, 165, 233, 0.3);
+    }
+    .btn-cam-scan:hover {
+      filter: brightness(1.08);
+    }
+
+    .input-scan-matched {
+      border-color: #10b981 !important;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.28) !important;
+      transition: all 0.2s ease;
+    }
+
+    .scan-feedback-line {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      min-height: 18px;
+      color: #34d399;
+    }
+    .scan-feedback-line.warn {
+      color: #fbbf24;
+    }
+
+    /* Modal de Escáner por Cámara */
+    #cam-scanner-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 9, 18, 0.9);
+      backdrop-filter: blur(8px);
+      z-index: 99999;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+    .cam-scanner-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 440px;
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+    }
+    .cam-video-box {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #050811;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      margin: 12px 0;
+    }
+    .cam-video-box video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .cam-aim-line {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      top: 50%;
+      height: 2px;
+      background: rgba(239, 68, 68, 0.85);
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+      transform: translateY(-50%);
+      pointer-events: none;
     }
 
     /* Métricas del Dashboard */
@@ -869,6 +1033,13 @@
         font-size: 1.25rem;
         line-height: 1.25;
         margin-bottom: 2px;
+        gap: 7px;
+      }
+      header h1 .title-box-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 0.85rem;
+        border-radius: 7px;
       }
 
       .nav-buttons-bar {
@@ -1103,7 +1274,7 @@
     }
 
     .panel, .stat-card, .pick-panel-container, .global-panel-container, .users-panel-container, .import-export-panel {
-      border-color: rgba(56, 189, 248, 0.14);
+      border-color: var(--card-border);
       box-shadow: 0 12px 32px rgba(2, 6, 23, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
     }
 
@@ -1158,9 +1329,9 @@
     }
 
     .map-cell.is-selected {
-      outline: 2px solid #38bdf8;
+      outline: 2px solid #e2e8f0;
       outline-offset: 1px;
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+      box-shadow: 0 0 10px rgba(15, 23, 42, 0.55);
       transform: scale(1.04);
       z-index: 2;
     }
@@ -1321,6 +1492,20 @@
     </div>
   </div>
 
+  <!-- MODAL ESCÁNER POR CÁMARA -->
+  <div id="cam-scanner-modal">
+    <div class="cam-scanner-card">
+      <h3 style="color:#38bdf8; margin-bottom:4px;">📷 Escáner de Código de Barras</h3>
+      <p id="cam-scanner-target-label" style="font-size:0.82rem; color:var(--text-muted);">Apunta la cámara al código de barras del producto</p>
+      <div class="cam-video-box">
+        <video id="cam-scanner-video" playsinline muted autoplay></video>
+        <div class="cam-aim-line"></div>
+      </div>
+      <div id="cam-scanner-status" style="font-size:0.8rem; color:#94a3b8; margin-bottom:12px;">Iniciando cámara...</div>
+      <button type="button" class="btn-guest" style="margin-top:0;" onclick="cerrarCamScanner()">✕ Cerrar Cámara</button>
+    </div>
+  </div>
+
   <!-- MODAL VERIFICACIÓN CONTRASEÑA ADMIN PARA VER PINES -->
   <div id="pin-verify-modal" style="display:none; position:fixed; inset:0; background:rgba(7,11,20,0.85); backdrop-filter:blur(6px); z-index:99999; justify-content:center; align-items:center; padding:16px;">
     <div class="auth-card" style="max-width:380px;">
@@ -1366,8 +1551,8 @@
   <div class="container" id="app-container">
     <header>
       <div id="user-session-badge">Usuario: <strong id="current-user-label">Admin</strong></div>
-      <div class="header-subtitle">WMS & Control de Inventario Operativo</div>
-      <h1>📦 Sistema de Control de Bodega & Mapas</h1>
+      <div class="header-subtitle">Control de Bodega y Operaciones</div>
+      <h1><span class="title-box-icon" aria-hidden="true">📦</span><span>Sistema y Control de Bodega</span></h1>
       
       <!-- BOTONES SUPERIORES DE NAVEGACIÓN -->
       <div class="nav-buttons-bar">
@@ -1468,6 +1653,7 @@
             <label class="perm-check"><input type="checkbox" id="perm-movimientos"> <span>Ver Pestaña Movimientos</span></label>
             <label class="perm-check"><input type="checkbox" id="perm-excel"> <span>Exportar / Importar Excel</span></label>
             <label class="perm-check"><input type="checkbox" id="perm-eliminar"> <span>Eliminar Registros</span></label>
+            <label class="perm-check"><input type="checkbox" id="perm-eliminar-movimientos"> <span>Decidir Qué Movimientos Eliminar</span></label>
             <label class="perm-check"><input type="checkbox" id="perm-usuarios"> <span>Administrar Usuarios</span></label>
           </div>
         </div>
@@ -1590,14 +1776,26 @@
         <div id="pick-order-status-banner" class="pick-order-alert"></div>
       </div>
 
-      <!-- PASO 2: PRODUCTOS DE LA ORDEN (Desbloqueado solo cuando la orden está tomada por el usuario actual) -->
+      <!-- PASO 2: PRODUCTOS DE LA ORDEN -->
       <div id="pick-form" class="pick-fields-locked">
+        <div class="scan-toolbar">
+          <div class="scan-toolbar-left">
+            <span class="scan-status-pill" id="pick-scan-badge">⚡ ESCÁNER RÁPIDO LISTO</span>
+            <label class="scan-toggle-label">
+              <input type="checkbox" id="pick-autofocus-qty" checked>
+              Auto-enfocar cajas al detectar código
+            </label>
+          </div>
+          <button type="button" class="btn-cam-scan" onclick="abrirCamScanner('pick')">📷 Escanear con Cámara</button>
+        </div>
+
         <input type="hidden" id="pick-selected-id" value="">
         <div class="form-grid">
           <div class="form-group">
-            <label for="pick-search-input">🔍 Buscar / Escanear (Nombre, SAP, Código o Ubicación)</label>
-            <input type="text" id="pick-search-input" list="pick-products-list" placeholder="Escribe nombre, SAP, código de barras o ubicación..." autocomplete="off" oninput="onPickSearchInput()">
+            <label for="pick-search-input">🔍 Escanear / Buscar (Código de Barras, SAP, Nombre o Ubicación)</label>
+            <input type="text" id="pick-search-input" list="pick-products-list" placeholder="Dispara pistola de barras o escribe SAP / nombre..." autocomplete="off" oninput="onPickSearchInput()">
             <datalist id="pick-products-list"></datalist>
+            <div class="scan-feedback-line" id="pick-scan-feedback"></div>
             <div class="pick-multi-loc-hint" id="pick-multi-loc-hint"></div>
           </div>
 
@@ -1613,12 +1811,12 @@
 
           <div class="form-group">
             <label for="pick-boxes">Cajas a Restar (Salida)</label>
-            <input type="number" id="pick-boxes" min="0" value="" placeholder="0">
+            <input type="number" id="pick-boxes" min="0" value="" placeholder="0" onkeypress="if(event.key==='Enter'){ event.preventDefault(); confirmarSalidaDirecta(); }">
           </div>
 
           <div class="form-group">
             <label for="pick-units">Unidades Sueltas a Restar</label>
-            <input type="number" id="pick-units" min="0" value="" placeholder="0">
+            <input type="number" id="pick-units" min="0" value="" placeholder="0" onkeypress="if(event.key==='Enter'){ event.preventDefault(); confirmarSalidaDirecta(); }">
           </div>
         </div>
 
@@ -1694,22 +1892,35 @@
       <!-- Panel de Formulario Ingreso con Base Maestra de Productos Oficiales -->
       <div class="panel" id="form-panel-wrapper">
         <div class="panel-title" id="form-title">📦 Ingresar Nuevo Producto</div>
+
+        <div class="scan-toolbar">
+          <div class="scan-toolbar-left">
+            <span class="scan-status-pill" id="entry-scan-badge">⚡ DETECCIÓN RÁPIDA DE BARRAS</span>
+            <label class="scan-toggle-label">
+              <input type="checkbox" id="entry-autofocus-boxes" checked>
+              Saltar a Cajas al detectar código
+            </label>
+          </div>
+          <button type="button" class="btn-cam-scan" onclick="abrirCamScanner('entry')">📷 Escanear con Cámara</button>
+        </div>
+
         <form id="inventory-form">
           <input type="hidden" id="editing-id" value="">
 
           <div class="form-grid">
+            <!-- CAMPO CÓDIGO DE BARRAS PREDICTIVO (PRIMERO PARA ESCANEO RÁPIDO) -->
+            <div class="form-group">
+              <label for="barcode">Código de Barras (Escaneo Rápido)</label>
+              <input type="text" id="barcode" list="barcode-predict-list" required placeholder="Escanee código de barras..." autocomplete="off" oninput="onBarcodeInput()" onkeypress="if(event.key==='Enter'){ event.preventDefault(); manejarEnterCodigoIngreso('barcode'); }">
+              <datalist id="barcode-predict-list"></datalist>
+              <div class="scan-feedback-line" id="entry-scan-feedback"></div>
+            </div>
+
             <!-- CAMPO SAP PREDICTIVO -->
             <div class="form-group">
               <label for="sap">Código SAP</label>
-              <input type="text" id="sap" list="sap-predict-list" required placeholder="Escribe o selecciona SAP..." autocomplete="off" oninput="onSapInput()">
+              <input type="text" id="sap" list="sap-predict-list" required placeholder="Escribe o selecciona SAP..." autocomplete="off" oninput="onSapInput()" onkeypress="if(event.key==='Enter'){ event.preventDefault(); manejarEnterCodigoIngreso('sap'); }">
               <datalist id="sap-predict-list"></datalist>
-            </div>
-
-            <!-- CAMPO CÓDIGO DE BARRAS PREDICTIVO -->
-            <div class="form-group">
-              <label for="barcode">Código de Barras</label>
-              <input type="text" id="barcode" list="barcode-predict-list" required placeholder="Escanee o ingrese código..." autocomplete="off" oninput="onBarcodeInput()">
-              <datalist id="barcode-predict-list"></datalist>
             </div>
 
             <!-- CAMPO DESCRIPCIÓN PREDICTIVO -->
@@ -1810,6 +2021,7 @@
             <th>CÓDIGO SAP</th>
             <th>DESCRIPCIÓN</th>
             <th>CANTIDAD RETIRADA / INGRESADA</th>
+            <th id="th-mov-actions">ELIMINAR</th>
           </tr>
         </thead>
         <tbody id="movements-list"></tbody>
@@ -1824,6 +2036,317 @@
       return n.toLocaleString("en-US");
     }
 
+    // =========================================================================
+    // MOTOR OPTIMIZADO DE DETECCIÓN RÁPIDA DE CÓDIGOS DE BARRAS (PISTOLA + CÁMARA)
+    // =========================================================================
+    let lastKeystrokeTime = 0;
+    let rapidBurstCount = 0;
+    let rapidBurstTimer = null;
+
+    function normalizarCodigoBarra(val) {
+      return String(val || "").replace(/[\r\n\t]/g, "").trim();
+    }
+
+    function flashScanBadge(badgeId, textoTemporal) {
+      const badge = document.getElementById(badgeId);
+      if (!badge) return;
+      const original = badge.dataset.origText || badge.textContent;
+      if (!badge.dataset.origText) badge.dataset.origText = original;
+      badge.textContent = textoTemporal || "⚡ CÓDIGO DETECTADO";
+      badge.classList.add("flash");
+      clearTimeout(badge._flashTimer);
+      badge._flashTimer = setTimeout(() => {
+        badge.textContent = badge.dataset.origText;
+        badge.classList.remove("flash");
+      }, 1100);
+    }
+
+    function highlightInputDetected(inputEl) {
+      if (!inputEl) return;
+      inputEl.classList.remove("input-scan-matched");
+      void inputEl.offsetWidth;
+      inputEl.classList.add("input-scan-matched");
+      setTimeout(() => inputEl.classList.remove("input-scan-matched"), 1200);
+    }
+
+    function buscarEnCatalogoPorCodigo(code) {
+      const clean = normalizarCodigoBarra(code);
+      if (!clean) return null;
+      const low = clean.toLowerCase();
+
+      // 1. Buscar primero en base maestra por código de barras exacto
+      let found = BASE_DATOS_MAESTRA.find(i => i.barcode && i.barcode !== "N/A" && String(i.barcode).trim().toLowerCase() === low);
+      if (found) return { ...found, source: "MAESTRA" };
+
+      // 2. Buscar en inventario actual por código de barras exacto
+      let invFound = inventory.find(i => i.barcode && i.barcode !== "N/A" && String(i.barcode).trim().toLowerCase() === low);
+      if (invFound) return { ...invFound, source: "INVENTARIO" };
+
+      // 3. Buscar por código SAP exacto
+      found = BASE_DATOS_MAESTRA.find(i => i.sap && String(i.sap).trim().toLowerCase() === low);
+      if (found) return { ...found, source: "SAP" };
+
+      invFound = inventory.find(i => i.sap && String(i.sap).trim().toLowerCase() === low);
+      if (invFound) return { ...invFound, source: "SAP" };
+
+      return null;
+    }
+
+    function aplicarCodigoEscaneadoEnIngreso(rawCode, fromScannerEnter = false) {
+      const barcodeInput = document.getElementById("barcode");
+      const fbEl = document.getElementById("entry-scan-feedback");
+      if (!barcodeInput) return false;
+
+      const clean = normalizarCodigoBarra(rawCode);
+      if (!clean) return false;
+
+      barcodeInput.value = clean;
+      const match = buscarEnCatalogoPorCodigo(clean);
+
+      if (match) {
+        if (match.sap) document.getElementById("sap").value = match.sap;
+        if (match.description) document.getElementById("description").value = match.description;
+        if (match.unitsPerBox) document.getElementById("unitsPerBox").value = match.unitsPerBox;
+        if (match.source === "INVENTARIO" && match.location && !document.getElementById("location").value.trim()) {
+          // No pisamos ubicación si ya eligió una nueva, solo mostramos sugerencia
+        }
+        updateCalcPreview();
+        highlightInputDetected(barcodeInput);
+        flashScanBadge("entry-scan-badge", `⚡ DETECTADO: ${match.sap}`);
+        if (fbEl) {
+          fbEl.className = "scan-feedback-line";
+          fbEl.textContent = `✓ Coincidencia instantánea: ${match.sap} — ${match.description}`;
+        }
+
+        const autoBoxes = document.getElementById("entry-autofocus-boxes")?.checked;
+        if ((fromScannerEnter || rapidBurstCount >= 3) && autoBoxes) {
+          const locVal = document.getElementById("location")?.value.trim();
+          const targetEl = locVal ? document.getElementById("boxes") : document.getElementById("location");
+          setTimeout(() => {
+            if (targetEl) {
+              targetEl.focus();
+              if (targetEl.select) targetEl.select();
+            }
+          }, 30);
+        }
+        return true;
+      } else {
+        if (fbEl) {
+          fbEl.className = "scan-feedback-line warn";
+          fbEl.textContent = `Código "${clean}" no está en catálogo: completa SAP y descripción.`;
+        }
+        return false;
+      }
+    }
+
+    function manejarEnterCodigoIngreso(campoOrigen) {
+      if (campoOrigen === "barcode") {
+        const val = document.getElementById("barcode").value;
+        aplicarCodigoEscaneadoEnIngreso(val, true);
+      } else if (campoOrigen === "sap") {
+        onSapInput();
+        const autoBoxes = document.getElementById("entry-autofocus-boxes")?.checked;
+        if (autoBoxes) {
+          const locVal = document.getElementById("location")?.value.trim();
+          const targetEl = locVal ? document.getElementById("boxes") : document.getElementById("location");
+          if (targetEl) targetEl.focus();
+        }
+      }
+    }
+
+    function aplicarCodigoEscaneadoEnPicking(rawCode, fromScannerEnter = false) {
+      const pickInput = document.getElementById("pick-search-input");
+      const fbEl = document.getElementById("pick-scan-feedback");
+      if (!pickInput) return false;
+
+      const clean = normalizarCodigoBarra(rawCode);
+      if (!clean) return false;
+
+      const low = clean.toLowerCase();
+      // Buscar todas las ubicaciones en inventario con ese código de barras o SAP
+      const matches = inventory.filter(i =>
+        (i.barcode && i.barcode !== "N/A" && String(i.barcode).trim().toLowerCase() === low) ||
+        (i.sap && String(i.sap).trim().toLowerCase() === low)
+      );
+
+      if (matches.length > 0) {
+        // Priorizar la ubicación con mayor stock disponible
+        matches.sort((a, b) => (Number(b.totalUnits) || 0) - (Number(a.totalUnits) || 0));
+        const chosen = matches[0];
+        selectPickItemById(chosen.id);
+        highlightInputDetected(pickInput);
+        flashScanBadge("pick-scan-badge", `⚡ DETECTADO: ${chosen.location}`);
+
+        if (fbEl) {
+          fbEl.className = "scan-feedback-line";
+          fbEl.textContent = matches.length > 1
+            ? `✓ Código detectado en ${matches.length} ubicaciones. Seleccionada ${chosen.location} (${formatNum(chosen.totalUnits)} unids).`
+            : `✓ Producto detectado en ${chosen.location}: ${chosen.description} (${formatNum(chosen.totalUnits)} unids).`;
+        }
+
+        const autoQty = document.getElementById("pick-autofocus-qty")?.checked;
+        if ((fromScannerEnter || rapidBurstCount >= 3) && autoQty) {
+          setTimeout(() => {
+            const boxesEl = document.getElementById("pick-boxes");
+            if (boxesEl) {
+              boxesEl.focus();
+              boxesEl.select();
+            }
+          }, 30);
+        }
+        return true;
+      } else {
+        // Verificar si existe en catálogo maestro aunque tenga 0 stock en bodega
+        const catMatch = buscarEnCatalogoPorCodigo(clean);
+        if (fbEl) {
+          fbEl.className = "scan-feedback-line warn";
+          fbEl.textContent = catMatch
+            ? `⚠️ "${catMatch.description}" (${catMatch.sap}) no tiene stock registrado en ubicaciones.`
+            : `⚠️ Código "${clean}" no encontrado en el inventario actual.`;
+        }
+        return false;
+      }
+    }
+
+    // Detector global de ráfagas de pistola de código de barras (teclas < 45ms entre sí)
+    document.addEventListener("keydown", (e) => {
+      if (document.getElementById("app-container")?.style.display === "none") return;
+      const active = document.activeElement;
+      if (!active) return;
+
+      const isScanTarget =
+        active.id === "barcode" ||
+        active.id === "sap" ||
+        active.id === "pick-search-input";
+
+      if (!isScanTarget) return;
+
+      const now = performance.now();
+      const delta = now - lastKeystrokeTime;
+      lastKeystrokeTime = now;
+
+      if (e.key.length === 1) {
+        if (delta < 45) {
+          rapidBurstCount += 1;
+        } else {
+          rapidBurstCount = 1;
+        }
+        clearTimeout(rapidBurstTimer);
+        rapidBurstTimer = setTimeout(() => { rapidBurstCount = 0; }, 160);
+      }
+
+      if (e.key === "Enter") {
+        if (active.id === "barcode") {
+          e.preventDefault();
+          aplicarCodigoEscaneadoEnIngreso(active.value, true);
+        } else if (active.id === "pick-search-input") {
+          e.preventDefault();
+          const picked = aplicarCodigoEscaneadoEnPicking(active.value, true);
+          if (!picked) {
+            onPickSearchInput();
+          }
+        }
+      }
+    }, true);
+
+    // Escáner por Cámara (BarcodeDetector nativo + ZXing fallback)
+    let camStream = null;
+    let camScanInterval = null;
+    let camZxingReader = null;
+    let camTargetMode = "pick";
+
+    async function abrirCamScanner(mode) {
+      camTargetMode = mode || "pick";
+      const modal = document.getElementById("cam-scanner-modal");
+      const video = document.getElementById("cam-scanner-video");
+      const statusEl = document.getElementById("cam-scanner-status");
+      const labelEl = document.getElementById("cam-scanner-target-label");
+
+      if (labelEl) {
+        labelEl.textContent = mode === "entry"
+          ? "Escaneando para INGRESO de mercancía..."
+          : "Escaneando para PICKING / SALIDA...";
+      }
+      if (statusEl) statusEl.textContent = "Solicitando acceso a la cámara...";
+      if (modal) modal.style.display = "flex";
+
+      try {
+        if (window.ZXing && window.ZXing.BrowserMultiFormatReader) {
+          camZxingReader = new window.ZXing.BrowserMultiFormatReader();
+          const devices = await camZxingReader.listVideoInputDevices();
+          const rearCam = devices.find(d => /back|rear|environment|trasera/i.test(d.label)) || devices[devices.length - 1];
+          const deviceId = rearCam ? rearCam.deviceId : undefined;
+          if (statusEl) statusEl.textContent = "Cámara activa — enfoca el código de barras...";
+
+          await camZxingReader.decodeFromVideoDevice(deviceId, video, (result, err) => {
+            if (result && result.getText) {
+              const codeText = normalizarCodigoBarra(result.getText());
+              if (codeText) {
+                procesarCodigoDesdeCamara(codeText);
+              }
+            }
+          });
+          return;
+        }
+
+        const constraints = {
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false
+        };
+        camStream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = camStream;
+        await video.play();
+
+        if ("BarcodeDetector" in window) {
+          const detector = new window.BarcodeDetector({
+            formats: ["ean_13", "ean_8", "code_128", "code_39", "upc_a", "upc_e", "itf", "qr_code"]
+          });
+          if (statusEl) statusEl.textContent = "Cámara activa — apunta al código de barras...";
+          camScanInterval = setInterval(async () => {
+            if (!video || video.readyState < 2) return;
+            try {
+              const barcodes = await detector.detect(video);
+              if (barcodes && barcodes.length > 0 && barcodes[0].rawValue) {
+                procesarCodigoDesdeCamara(normalizarCodigoBarra(barcodes[0].rawValue));
+              }
+            } catch (e) {}
+          }, 180);
+        } else {
+          if (statusEl) statusEl.textContent = "Tu navegador no soporta lector de cámara directo; usa pistola o escribe el código.";
+        }
+      } catch (err) {
+        if (statusEl) {
+          statusEl.textContent = "No se pudo acceder a la cámara (verifica permisos HTTPS o usa pistola de barras).";
+        }
+      }
+    }
+
+    function procesarCodigoDesdeCamara(codeText) {
+      cerrarCamScanner();
+      if (camTargetMode === "entry") {
+        aplicarCodigoEscaneadoEnIngreso(codeText, true);
+      } else {
+        aplicarCodigoEscaneadoEnPicking(codeText, true);
+      }
+    }
+
+    function cerrarCamScanner() {
+      clearInterval(camScanInterval);
+      camScanInterval = null;
+      if (camZxingReader) {
+        try { camZxingReader.reset(); } catch (e) {}
+        camZxingReader = null;
+      }
+      if (camStream) {
+        camStream.getTracks().forEach(t => t.stop());
+        camStream = null;
+      }
+      const video = document.getElementById("cam-scanner-video");
+      if (video) video.srcObject = null;
+      const modal = document.getElementById("cam-scanner-modal");
+      if (modal) modal.style.display = "none";
+    }
+
     const PERMISOS_PRESETS = {
       admin: {
         roleLabel: "Admin",
@@ -1834,6 +2357,7 @@
         movimientos: true,
         excel: true,
         eliminar: true,
+        eliminarMovimientos: true,
         usuarios: true
       },
       solo_ingresar: {
@@ -1845,6 +2369,7 @@
         movimientos: false,
         excel: false,
         eliminar: false,
+        eliminarMovimientos: false,
         usuarios: false
       },
       picker: {
@@ -1856,6 +2381,7 @@
         movimientos: false,
         excel: false,
         eliminar: false,
+        eliminarMovimientos: false,
         usuarios: false
       },
       solo_movimientos: {
@@ -1867,6 +2393,7 @@
         movimientos: true,
         excel: false,
         eliminar: false,
+        eliminarMovimientos: false,
         usuarios: false
       },
       guest: {
@@ -1878,6 +2405,7 @@
         movimientos: false,
         excel: false,
         eliminar: false,
+        eliminarMovimientos: false,
         usuarios: false
       }
     };
@@ -1974,6 +2502,7 @@
             movimientos: u.movimientos !== undefined ? !!u.movimientos : (u.role === "admin" || !!u.usuarios),
             excel: !!u.excel,
             eliminar: !!u.eliminar,
+            eliminarMovimientos: (u.eliminarMovimientos !== undefined) ? !!u.eliminarMovimientos : (!!u.isPrimary || k === "Alexander"),
             usuarios: !!u.usuarios
           };
         });
@@ -2036,7 +2565,7 @@
     }
 
     function calcularEtiquetaRol(perms) {
-      if (perms.ingresar && perms.pickear && perms.global && perms.excel && perms.eliminar && perms.usuarios) {
+      if (perms.ingresar && perms.pickear && perms.global && perms.excel && perms.eliminar && perms.eliminarMovimientos && perms.usuarios) {
         return { roleLabel: "Admin", role: "admin" };
       }
       if (perms.ingresar && !perms.pickear && !perms.excel && !perms.eliminar && !perms.usuarios) {
@@ -2063,6 +2592,7 @@
       if (document.getElementById("perm-movimientos")) document.getElementById("perm-movimientos").checked = !!preset.movimientos;
       document.getElementById("perm-excel").checked = !!preset.excel;
       document.getElementById("perm-eliminar").checked = !!preset.eliminar;
+      if (document.getElementById("perm-eliminar-movimientos")) document.getElementById("perm-eliminar-movimientos").checked = !!preset.eliminarMovimientos;
       document.getElementById("perm-usuarios").checked = !!preset.usuarios;
     }
 
@@ -2074,6 +2604,7 @@
         movimientos: document.getElementById("perm-movimientos") ? document.getElementById("perm-movimientos").checked : false,
         excel: document.getElementById("perm-excel").checked,
         eliminar: document.getElementById("perm-eliminar").checked,
+        eliminarMovimientos: document.getElementById("perm-eliminar-movimientos") ? document.getElementById("perm-eliminar-movimientos").checked : false,
         usuarios: document.getElementById("perm-usuarios").checked
       };
       const tag = calcularEtiquetaRol(rawPerms);
@@ -2122,7 +2653,7 @@
       if (!pendingUserPermsEdits[username] || !USERS_CONFIG[username]) return false;
       const orig = USERS_CONFIG[username];
       const draft = pendingUserPermsEdits[username];
-      const keys = ["ingresar", "pickear", "global", "movimientos", "excel", "eliminar", "usuarios"];
+      const keys = ["ingresar", "pickear", "global", "movimientos", "excel", "eliminar", "eliminarMovimientos", "usuarios"];
       return keys.some(k => !!orig[k] !== !!draft[k]);
     }
 
@@ -2357,6 +2888,7 @@
         ["movimientos", "Movimientos"],
         ["excel", "Excel"],
         ["eliminar", "Eliminar"],
+        ["eliminarMovimientos", "Eliminar Movimientos"],
         ["usuarios", "Usuarios"]
       ];
 
@@ -2643,6 +3175,7 @@
     }
 
     function cerrarSesion() {
+      cerrarCamScanner();
       pinesVisiblesPorAdmin = false;
       cerrarModalAdminPin();
       limpiarSesionActiva();
@@ -2920,7 +3453,7 @@
         const quien = record.completedBy || record.user || 'Otro usuario';
         const cuando = record.completedAtText || 'fecha no registrada';
         banner.className = 'pick-order-alert already-completed';
-        banner.innerHTML = `⛔ Este picking (<strong>#${orderNum}</strong>) ya fue pickeado por <strong>${quien}</strong> el <strong>${cuando}</strong>.`;
+        banner.innerHTML = `⛔ Este picking (<strong>#${orderNum}</strong>) ya fue pickiado por <strong>${quien}</strong> el <strong>${cuando}</strong>. No se permite pickearlo.`;
         pickForm.classList.add('pick-fields-locked');
         btnStart.style.display = 'inline-block';
         btnStart.disabled = true;
@@ -2939,7 +3472,7 @@
           activePickingOrderNumber = orderNum;
           const desde = record.startedAtText || '';
           banner.className = 'pick-order-alert active-mine';
-          banner.innerHTML = `✅ Orden <strong>#${orderNum}</strong> asignada a ti (<strong>${currentUserName}</strong>)${desde ? ' desde el ' + desde : ''}. Puedes registrar salidas y al terminar presiona <strong>"Finalizar Orden"</strong>.`;
+          banner.innerHTML = `✅ Orden <strong>#${orderNum}</strong> asignada a ti (<strong>${currentUserName}</strong>)${desde ? ' desde el ' + desde : ''}. Puedes escanear o buscar productos y confirmar salidas.`;
           pickForm.classList.remove('pick-fields-locked');
           btnStart.style.display = 'none';
           btnFinish.style.display = 'inline-block';
@@ -2988,7 +3521,7 @@
       if (existing) {
         if (existing.status === 'completed') {
           verificarEstadoOrdenPicking();
-          alert(`Este picking (#${orderNum}) ya fue pickeado por ${existing.completedBy || existing.user} el ${existing.completedAtText}.`);
+          alert(`Este picking (#${orderNum}) ya fue pickiado por ${existing.completedBy || existing.user} el ${existing.completedAtText}. No se permite pickearlo.`);
           return;
         }
         if (existing.status === 'in_progress') {
@@ -3017,6 +3550,10 @@
       pickingOrders[orderNum] = orderData;
       db.ref('picking_orders/' + orderNum).set(orderData);
       verificarEstadoOrdenPicking();
+      setTimeout(() => {
+        const pickSearch = document.getElementById('pick-search-input');
+        if (pickSearch) pickSearch.focus();
+      }, 60);
     }
 
     function finalizarOrdenPicking() {
@@ -3171,9 +3708,15 @@
     }
 
     function onBarcodeInput() {
-      const val = document.getElementById('barcode').value.trim();
+      const rawVal = document.getElementById('barcode').value;
+      const val = normalizarCodigoBarra(rawVal);
+      const fbEl = document.getElementById("entry-scan-feedback");
+      if (!val) {
+        if (fbEl) fbEl.textContent = "";
+        return;
+      }
       const master = getCombinedMasterList();
-      const found = master.find(i => i.barcode === val);
+      const found = master.find(i => i.barcode && i.barcode !== 'N/A' && String(i.barcode).trim() === val);
       if (found) {
         document.getElementById('sap').value = found.sap || '';
         document.getElementById('description').value = found.description || '';
@@ -3181,6 +3724,14 @@
           document.getElementById('unitsPerBox').value = found.unitsPerBox;
         }
         updateCalcPreview();
+        highlightInputDetected(document.getElementById('barcode'));
+        if (fbEl) {
+          fbEl.className = "scan-feedback-line";
+          fbEl.textContent = `✓ Coincidencia: ${found.sap} — ${found.description}`;
+        }
+      } else if (fbEl) {
+        fbEl.className = "scan-feedback-line warn";
+        fbEl.textContent = "";
       }
     }
 
@@ -3214,6 +3765,8 @@
         const unitsEl = document.getElementById('units');
         if (boxesEl) boxesEl.value = '';
         if (unitsEl) unitsEl.value = '';
+        const entryFb = document.getElementById('entry-scan-feedback');
+        if (entryFb) entryFb.textContent = '';
         if (typeof updateCalcPreview === 'function') updateCalcPreview();
       }
 
@@ -3229,6 +3782,8 @@
       if (pickBoxesEl) pickBoxesEl.value = '';
       const pickUnitsEl = document.getElementById('pick-units');
       if (pickUnitsEl) pickUnitsEl.value = '';
+      const pickFb = document.getElementById('pick-scan-feedback');
+      if (pickFb) pickFb.textContent = '';
       const pickHintEl = document.getElementById('pick-multi-loc-hint');
       if (pickHintEl) {
         pickHintEl.style.display = 'none';
@@ -3666,7 +4221,7 @@
         const productData = {
           id: editingId ? Number(editingId) : Date.now(),
           sap: sap,
-          barcode: document.getElementById('barcode').value.trim(),
+          barcode: normalizarCodigoBarra(document.getElementById('barcode').value) || 'N/A',
           description: description,
           location: location,
           boxes: boxes,
@@ -3742,9 +4297,12 @@
     }
 
     function onPickSearchInput() {
-      const val = document.getElementById('pick-search-input').value.trim();
+      const rawVal = document.getElementById('pick-search-input').value;
+      const val = normalizarCodigoBarra(rawVal);
       const hintEl = document.getElementById('pick-multi-loc-hint');
+      const fbEl = document.getElementById('pick-scan-feedback');
       if (!val) {
+        if (fbEl) fbEl.textContent = '';
         selectPickItemById(null);
         return;
       }
@@ -3753,10 +4311,21 @@
 
       if (!item) {
         const low = val.toLowerCase();
-        item = inventory.find(i =>
-          (i.barcode && i.barcode !== 'N/A' && i.barcode.toLowerCase() === low) ||
-          (i.sap && i.sap.toLowerCase() === low)
+        const barcodeOrSapMatches = inventory.filter(i =>
+          (i.barcode && i.barcode !== 'N/A' && String(i.barcode).trim().toLowerCase() === low) ||
+          (i.sap && String(i.sap).trim().toLowerCase() === low)
         );
+        if (barcodeOrSapMatches.length > 0) {
+          barcodeOrSapMatches.sort((a, b) => (Number(b.totalUnits) || 0) - (Number(a.totalUnits) || 0));
+          item = barcodeOrSapMatches[0];
+          selectPickItemById(item.id);
+          highlightInputDetected(document.getElementById('pick-search-input'));
+          if (fbEl) {
+            fbEl.className = "scan-feedback-line";
+            fbEl.textContent = `✓ Detectado: ${item.description} (${item.location})`;
+          }
+          return;
+        }
       }
 
       if (item) {
@@ -3940,13 +4509,27 @@
 
       addMovementLog('SALIDA', item.location, item.sap, item.description, boxesToSub, unitsToSub, orderNum);
 
+      const ahoraTexto = formatearFechaHoraExacta(new Date());
       const updatedOrder = {
         ...orderRec,
+        orderNumber: orderNum,
+        status: 'completed',
+        completedBy: currentUserName,
+        completedByKey: currentUserKey || currentUserName,
+        completedAt: Date.now(),
+        completedAtText: ahoraTexto,
         itemsPicked: (orderRec.itemsPicked || 0) + 1,
         lastUpdatedAt: Date.now()
       };
       pickingOrders[orderNum] = updatedOrder;
       db.ref('picking_orders/' + orderNum).set(updatedOrder);
+      activePickingOrderNumber = "";
+      const orderInputEl = document.getElementById('pick-order-number');
+      if (orderInputEl) {
+        orderInputEl.readOnly = false;
+        orderInputEl.value = "";
+      }
+      verificarEstadoOrdenPicking();
 
       const newTotal = (currentBoxes * item.unitsPerBox) + currentUnits;
 
@@ -3969,6 +4552,8 @@
       document.getElementById('pick-stock-info').value = "";
       document.getElementById('pick-boxes').value = "";
       document.getElementById('pick-units').value = "";
+      const pickFb = document.getElementById('pick-scan-feedback');
+      if (pickFb) pickFb.textContent = "";
 
       populatePickDatalist();
       updatePickRemainingPreview();
@@ -4016,6 +4601,8 @@
       document.getElementById('form-title').textContent = '📦 Ingresar Nuevo Producto';
       document.getElementById('btn-save').textContent = 'Guardar Producto en Ubicación';
       document.getElementById('btn-cancel').style.display = 'none';
+      const entryFb = document.getElementById('entry-scan-feedback');
+      if (entryFb) entryFb.textContent = '';
       updateCalcPreview();
       document.getElementById('boxes').value = '';
       document.getElementById('units').value = '';
@@ -4204,12 +4791,37 @@
       }
     }
 
+    function puedeEliminarMovimientos() {
+      const esAdminPrincipal = !!(currentUserPerms && currentUserPerms.isPrimary) || currentUserKey === "Alexander";
+      return !!(esAdminPrincipal || (currentUserPerms && currentUserPerms.eliminarMovimientos));
+    }
+
+    function eliminarMovimiento(movId) {
+      if (!puedeEliminarMovimientos()) {
+        alert('No tienes permiso para eliminar movimientos.');
+        return;
+      }
+      const mov = movements.find(item => item.id === movId);
+      const descTxt = mov ? `${mov.type} · ${mov.location} · ${mov.sap} (${mov.detail})` : 'este movimiento';
+      if (!confirm(`¿Seguro que deseas eliminar ${descTxt}?`)) return;
+
+      movements = movements.filter(item => item.id !== movId);
+      if (movId && typeof db !== "undefined" && db) {
+        db.ref('movimientos/' + movId).remove();
+      }
+      renderMovements();
+      renderPickingSessionSummary();
+    }
+
     function renderMovements() {
       const list = document.getElementById('movements-list');
       const panelWrap = document.getElementById('movements-panel-table-wrap');
       const panelSearch = document.getElementById('movements-panel-search') ? document.getElementById('movements-panel-search').value.toLowerCase() : '';
       const mainSearch = document.getElementById('search') ? document.getElementById('search').value.toLowerCase() : '';
       const searchFilter = (panelSearch || mainSearch || '').trim();
+      const canDelMov = puedeEliminarMovimientos();
+      const thMovAct = document.getElementById('th-mov-actions');
+      if (thMovAct) thMovAct.style.display = canDelMov ? 'table-cell' : 'none';
 
       const rowsHtml = movements.filter(m => {
         if (!searchFilter) return true;
@@ -4222,6 +4834,9 @@
         let badgeClass = 'badge-entrada';
         if (m.type === 'SALIDA') badgeClass = 'badge-salida';
         if (m.type === 'ACTUALIZACIÓN') badgeClass = 'badge-rack';
+        const delCell = canDelMov
+          ? `<td data-label="Eliminar"><button type="button" class="btn-delete" onclick="eliminarMovimiento('${m.id}')" title="Eliminar movimiento">🗑️ Eliminar</button></td>`
+          : '';
         return `
           <tr>
             <td data-label="Fecha / Hora">${m.date}</td>
@@ -4232,6 +4847,7 @@
             <td data-label="Código SAP">${m.sap}</td>
             <td data-label="Descripción">${m.description}</td>
             <td data-label="Movimiento"><strong style="color: #38bdf8;">${m.detail}</strong></td>
+            ${delCell}
           </tr>
         `;
       }).join('');
@@ -4250,9 +4866,10 @@
                 <th>CÓDIGO SAP</th>
                 <th>DESCRIPCIÓN</th>
                 <th>CANTIDAD RETIRADA / INGRESADA</th>
+                ${canDelMov ? '<th>ELIMINAR</th>' : ''}
               </tr>
             </thead>
-            <tbody>${rowsHtml || '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No hay movimientos registrados.</td></tr>'}</tbody>
+            <tbody>${rowsHtml || `<tr><td colspan="${canDelMov ? 9 : 8}" style="text-align:center;color:var(--text-muted);">No hay movimientos registrados.</td></tr>`}</tbody>
           </table>
         `;
       }
