@@ -1896,10 +1896,59 @@
     let currentUserKey = "";
     let currentUserPerms = { ...PERMISOS_PRESETS.guest };
 
+    const STORAGE_DELETED_USERS_KEY = "wms_usuarios_eliminados_v1";
+
+    function cargarUsuariosEliminados() {
+      try {
+        const raw = localStorage.getItem(STORAGE_DELETED_USERS_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr.map(x => String(x || "").trim()).filter(Boolean) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function guardarUsuariosEliminados(list) {
+      const clean = Array.from(new Set((list || []).map(x => String(x || "").trim()).filter(Boolean)));
+      try {
+        localStorage.setItem(STORAGE_DELETED_USERS_KEY, JSON.stringify(clean));
+      } catch (e) {}
+      if (typeof db !== "undefined" && db) {
+        db.ref("usuarios_eliminados").set(clean);
+      }
+      return clean;
+    }
+
+    let DELETED_USERS_LIST = cargarUsuariosEliminados();
+
+    function registrarUsuarioEliminado(username) {
+      const clean = String(username || "").trim();
+      if (!clean) return;
+      if (!DELETED_USERS_LIST.includes(clean)) {
+        DELETED_USERS_LIST.push(clean);
+      }
+      DELETED_USERS_LIST = guardarUsuariosEliminados(DELETED_USERS_LIST);
+    }
+
+    function limpiarUsuarioDeEliminados(username) {
+      const clean = String(username || "").trim();
+      if (!clean) return;
+      DELETED_USERS_LIST = guardarUsuariosEliminados(DELETED_USERS_LIST.filter(u => u !== clean));
+    }
+
     function normalizarDiccionarioUsuarios(rawDict) {
-      const base = JSON.parse(JSON.stringify(DEFAULT_USERS_CONFIG));
+      const deletedSet = new Set(DELETED_USERS_LIST || []);
+      const hasRemote = !!(rawDict && typeof rawDict === "object" && Object.keys(rawDict).length > 0);
+      const base = hasRemote ? {} : JSON.parse(JSON.stringify(DEFAULT_USERS_CONFIG));
+
+      if (!hasRemote) {
+        Object.keys(base).forEach(k => {
+          if (deletedSet.has(k)) delete base[k];
+        });
+      }
+
       if (rawDict && typeof rawDict === "object") {
-        if (rawDict["alexander04"] && !rawDict["Alexander"]) {
+        if (rawDict["alexander04"] && !rawDict["Alexander"] && !deletedSet.has("Alexander")) {
           const oldMain = rawDict["alexander04"];
           rawDict["Alexander"] = {
             ...oldMain,
@@ -1908,12 +1957,10 @@
           };
           delete rawDict["alexander04"];
         }
-        const tieneOtroAdminPrincipal = Object.keys(rawDict).some(k => rawDict[k] && rawDict[k].isPrimary && k !== "Alexander");
-        if (tieneOtroAdminPrincipal) {
-          delete base["Alexander"];
-        }
+
         Object.keys(rawDict).forEach(k => {
           if (k === "alexander04") return;
+          if (deletedSet.has(k)) return;
           const u = rawDict[k] || {};
           base[k] = {
             pin: String(u.pin ?? "").trim(),
@@ -1931,14 +1978,19 @@
           };
         });
       }
+
       if (!Object.keys(base).some(k => base[k] && base[k].isPrimary)) {
         const firstAdmin = Object.keys(base).find(k => base[k] && base[k].usuarios);
         if (firstAdmin) base[firstAdmin].isPrimary = true;
-        else base["Alexander"] = { pin: "041211", displayName: "Alexander", isPrimary: true, ...PERMISOS_PRESETS.admin };
+        else if (!deletedSet.has("Alexander")) {
+          base["Alexander"] = { pin: "041211", displayName: "Alexander", isPrimary: true, ...PERMISOS_PRESETS.admin };
+        }
       }
-      if (!base["ChrisA"] || !base["ChrisA"].pin) {
+
+      if (!hasRemote && !deletedSet.has("ChrisA") && (!base["ChrisA"] || !base["ChrisA"].pin)) {
         base["ChrisA"] = { pin: "042001", displayName: "ChrisA", ...PERMISOS_PRESETS.picker };
       }
+
       return base;
     }
 
@@ -2043,6 +2095,7 @@
         if (!ok) return;
       }
 
+      limpiarUsuarioDeEliminados(username);
       const perms = leerPermisosFormulario();
       USERS_CONFIG[username] = {
         pin,
@@ -2224,6 +2277,10 @@
       if (!confirm(`¿Eliminar al usuario "${username}"?`)) return;
       delete USERS_CONFIG[username];
       delete pendingUserPermsEdits[username];
+      registrarUsuarioEliminado(username);
+      if (typeof db !== "undefined" && db) {
+        db.ref("usuarios_sistema/" + username).remove();
+      }
       guardarUsuariosSistema();
     }
 
@@ -2757,6 +2814,23 @@
     let inventory = [];
     let movements = [];
     let currentTab = 'inventory';
+
+    db.ref('usuarios_eliminados').on('value', (snapshot) => {
+      const remoteDeleted = snapshot.val();
+      if (Array.isArray(remoteDeleted)) {
+        DELETED_USERS_LIST = Array.from(new Set(remoteDeleted.map(x => String(x || '').trim()).filter(Boolean)));
+        try {
+          localStorage.setItem(STORAGE_DELETED_USERS_KEY, JSON.stringify(DELETED_USERS_LIST));
+        } catch (e) {}
+        DELETED_USERS_LIST.forEach(uKey => {
+          if (USERS_CONFIG[uKey] && !USERS_CONFIG[uKey].isPrimary) {
+            delete USERS_CONFIG[uKey];
+          }
+        });
+        poblarSelectorLogin();
+        renderUsersTable();
+      }
+    });
 
     db.ref('usuarios_sistema').on('value', (snapshot) => {
       const remoteUsers = snapshot.val();
